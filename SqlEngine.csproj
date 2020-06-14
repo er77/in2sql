@@ -1,0 +1,345 @@
+﻿<Project ToolsVersion="16.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <!--
+    This section defines project-level properties.
+
+    AssemblyName
+      Name of the output assembly.
+    Configuration
+      Specifies a default value for debug.
+    OutputType
+      Must be "Library" for VSTO.
+    Platform
+      Specifies what CPU the output of this project can run on.
+    NoStandardLibraries
+      Set to "false" for VSTO.
+    RootNamespace
+      In C#, this specifies the namespace given to new files. In VB, all objects are
+      wrapped in this namespace at runtime.
+  -->
+  <PropertyGroup>
+    <ProjectTypeGuids>{BAA0C2D2-18E2-41B9-852F-F413020CAA33};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{758FEE3C-90CA-48CC-969D-4764A02A9D5F}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <NoStandardLibraries>false</NoStandardLibraries>
+    <RootNamespace>SqlEngine</RootNamespace>
+    <AssemblyName>SqlEngine</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <DefineConstants>VSTO40</DefineConstants>
+    <IsWebBootstrapper>False</IsWebBootstrapper>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <PublishUrl>C:\MyProject\SqlEngine_Setup\Publish\</PublishUrl>
+    <InstallUrl />
+    <TargetCulture>en</TargetCulture>
+    <ApplicationVersion>1.0.0.3</ApplicationVersion>
+    <AutoIncrementApplicationRevision>true</AutoIncrementApplicationRevision>
+    <UpdateEnabled>true</UpdateEnabled>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>days</UpdateIntervalUnits>
+    <ProductName>SqlEngine</ProductName>
+    <PublisherName />
+    <SupportUrl />
+    <FriendlyName>SqlEngine</FriendlyName>
+    <OfficeApplicationDescription />
+    <LoadBehavior>3</LoadBehavior>
+  </PropertyGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.VSTORuntime.4.0">
+      <Visible>False</Visible>
+      <ProductName>Microsoft Visual Studio 2010 Tools for Office Runtime %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <PropertyGroup>
+    <!--
+      OfficeApplication
+        Add-in host application
+    -->
+    <OfficeApplication>Excel</OfficeApplication>
+  </PropertyGroup>
+  <!--
+    This section defines properties that are set when the "Debug" configuration is selected.
+
+    DebugSymbols
+      If "true", create symbols (.pdb). If "false", do not create symbols.
+    DefineConstants
+      Constants defined for the preprocessor.
+    EnableUnmanagedDebugging
+      If "true", starting the debugger will attach both managed and unmanaged debuggers.
+    Optimize
+      If "true", optimize the build output. If "false", do not optimize.
+    OutputPath
+      Output path of project relative to the project file.
+    WarningLevel
+      Warning level for the compiler.
+  -->
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+    <DefineConstants>$(DefineConstants);DEBUG;TRACE</DefineConstants>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <!--
+    This section defines properties that are set when the "Release" configuration is selected.
+
+    DebugSymbols
+      If "true", create symbols (.pdb). If "false", do not create symbols.
+    DefineConstants
+      Constants defined for the preprocessor.
+    EnableUnmanagedDebugging
+      If "true", starting the debugger will attach both managed and unmanaged debuggers.
+    Optimize
+      If "true", optimize the build output. If "false", do not optimize.
+    OutputPath
+      Output path of project relative to the project file.
+    WarningLevel
+      Warning level for the compiler.
+  -->
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+    <DefineConstants>$(DefineConstants);TRACE</DefineConstants>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <!--
+    This section specifies references for the project.
+  -->
+  <ItemGroup>
+    <Reference Include="Accessibility" />
+    <Reference Include="Microsoft.Office.Interop.Excel, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="Microsoft.Office.Tools.Excel.v4.0.Utilities, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="Office, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Office.Tools.v4.0.Framework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Tools.Applications.Runtime, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.Office.Tools, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.Office.Tools.Common, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.Office.Tools.Excel, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Office.Tools.Common.v4.0.Utilities, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <Private>True</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="stdole, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+  <!--
+    This section defines the user source files that are part of the project.
+     
+    A "Compile" element specifies a source file to compile.
+    An "EmbeddedResource" element specifies an .resx file for embedded resources.
+    A "None" element specifies a file that is not to be passed to the compiler (for instance, 
+    a text file or XML file).
+    The "AppDesigner" element specifies the directory where the application properties files
+    can be found.
+  -->
+  <ItemGroup>
+    <Compile Include="in2SqlLibrary.cs" />
+    <Compile Include="in2SqlRegistry.cs" />
+    <Compile Include="In2SqlRibbon.cs" />
+    <Compile Include="In2SqlSvcUndoManagment.cs" />
+    <Compile Include="in2SqlWF03PanelRigtSqlM.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="in2SqlWF03PanelRigtSqlM.Designer.cs">
+      <DependentUpon>in2SqlWF03PanelRigtSqlM.cs</DependentUpon>
+    </Compile>
+    <Compile Include="in2SqlRightPaneTreeTables.cs" />
+    <Compile Include="In2SqlSvcODBC.cs" />
+    <Compile Include="In2SqlSvcTool.cs" />
+    <Compile Include="in2SqlWF01Login.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="in2SqlWF01Login.Designer.cs">
+      <DependentUpon>in2SqlWF01Login.cs</DependentUpon>
+    </Compile>
+    <Compile Include="in2SqlWF02PaneLeftOtline.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="in2SqlWF02PaneLeftOtline.Designer.cs">
+      <DependentUpon>in2SqlWF02PaneLeftOtline.cs</DependentUpon>
+    </Compile>
+    <Compile Include="In2SqlWF04EditQuery.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="In2SqlWF04EditQuery.Designer.cs">
+      <DependentUpon>In2SqlWF04EditQuery.cs</DependentUpon>
+    </Compile>
+    <Compile Include="in2SqlWF05SqlEngine.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="in2SqlWF05SqlEngine.Designer.cs">
+      <DependentUpon>in2SqlWF05SqlEngine.cs</DependentUpon>
+    </Compile>
+    <Compile Include="In2SqlVBAEngine.cs" />
+    <Compile Include="in2SqlWF06SqlBuilder.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="in2SqlWF06SqlBuilder.Designer.cs">
+      <DependentUpon>in2SqlWF06SqlBuilder.cs</DependentUpon>
+    </Compile>
+    <Compile Include="in2SqlWF07OdbcProperties.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="in2SqlWF07OdbcProperties.Designer.cs">
+      <DependentUpon>in2SqlWF07OdbcProperties.cs</DependentUpon>
+    </Compile>
+    <Compile Include="in2SqlWF08About.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="in2SqlWF08About.Designer.cs">
+      <DependentUpon>in2SqlWF08About.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <EmbeddedResource Include="in2SqlWF03PanelRigtSqlM.resx">
+      <DependentUpon>in2SqlWF03PanelRigtSqlM.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="in2SqlWF01Login.resx">
+      <DependentUpon>in2SqlWF01Login.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="in2SqlWF02PaneLeftOtline.resx">
+      <DependentUpon>in2SqlWF02PaneLeftOtline.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="In2SqlWF04EditQuery.resx">
+      <DependentUpon>In2SqlWF04EditQuery.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="in2SqlWF05SqlEngine.resx">
+      <DependentUpon>in2SqlWF05SqlEngine.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="in2SqlWF06SqlBuilder.resx">
+      <DependentUpon>in2SqlWF06SqlBuilder.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="in2SqlWF07OdbcProperties.resx">
+      <DependentUpon>in2SqlWF07OdbcProperties.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="in2SqlWF08About.resx">
+      <DependentUpon>in2SqlWF08About.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+    <Compile Include="SqlEngine.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <None Include="SqlEngine.Designer.xml">
+      <DependentUpon>SqlEngine.cs</DependentUpon>
+    </None>
+    <Compile Include="SqlEngine.Designer.cs">
+      <DependentUpon>SqlEngine.Designer.xml</DependentUpon>
+    </Compile>
+    <AppDesigner Include="Properties\" />
+    <None Include="SqlEngine_TemporaryKey.pfx" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="In2SqlRibbon.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="ico.ico" />
+  </ItemGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignManifests>true</SignManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestKeyFile>SqlEngine_TemporaryKey.pfx</ManifestKeyFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestCertificateThumbprint>70091F1E55E6B0F3476F4365683A6EBDF8610475</ManifestCertificateThumbprint>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>VSTO40;DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>VSTO40;TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>ico.ico</ApplicationIcon>
+  </PropertyGroup>
+  <!-- Include the build rules for a C# project. -->
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- Include additional build rules for an Office application add-in. -->
+  <Import Project="$(VSToolsPath)\OfficeTools\Microsoft.VisualStudio.Tools.Office.targets" Condition="'$(VSToolsPath)' != ''" />
+  <!-- This section defines VSTO properties that describe the host-changeable project properties. -->
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{BAA0C2D2-18E2-41B9-852F-F413020CAA33}">
+        <ProjectProperties HostName="Excel" HostPackage="{29A7B9D7-A7F1-4328-8EF0-6B2D1A56B2C1}" OfficeVersion="15.0" VstxVersion="4.0" ApplicationType="Excel" Language="cs" TemplatesPath="" DebugInfoExeName="#Software\Microsoft\Office\16.0\Excel\InstallRoot\Path#excel.exe" DebugInfoCommandLine="/x" AddItemTemplatesGuid="{51063C3A-E220-4D12-8922-BDA915ACD783}" />
+        <Host Name="Excel" GeneratedCodeNamespace="SqlEngine" PublishedHash="69C324AB27932AA2FBF2B7EA72250886FF164DE6" IconIndex="0">
+          <HostItem Name="ThisAddIn" Code="SqlEngine.cs" CanonicalName="AddIn" CanActivate="false" IconIndex="1" Blueprint="SqlEngine.Designer.xml" GeneratedCode="SqlEngine.Designer.cs" PublishedHash="A0F77ED2249F0FB5BA4C22AB1E16A2C773DDB024" />
+        </Host>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>
