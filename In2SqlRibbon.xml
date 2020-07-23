@@ -8,12 +8,12 @@
       -->       
       
       <tab id="SqlEngine" label="In2Sql"   visible="true"  keytip="YQA" >
-        <group id="grp_Main0" label="v0.1   "   >
-          <button id="ExecConnManager" label="Odbc Object Explorer"  onAction="ExecMenuButton"  imageMso="ObjectsGroup"  size = "large"   enabled="1"   />
-          <button id="ODBCManager"    label="Odbc Manager"  onAction="ExecMenuButton" imageMso="ObjectsUngroup"     enabled="1"  />
-          <button id="OdbcProp"    	label="Odbc Properties"    	onAction="ExecMenuButton"     imageMso="ApplyMasterPage1"  enabled="1"     />
+        <group id="grp_Main0" label="v0.2    "   >
+          <button id="ExecConnManager" label="Object Explorer"  onAction="ExecMenuButton"  imageMso="ObjectsGroup"  size = "large"   enabled="1"   />
+          <button id="ODBCManager"    label="Manager"  onAction="ExecMenuButton" imageMso="ObjectsUngroup"     enabled="1"  />
+          <button id="OdbcProp"    	label="Properties"    	onAction="ExecMenuButton"     imageMso="ApplyMasterPage1"  enabled="1"     />
           
-          <button id="BackOutl"    label=" Excel Outline"  onAction="ExecMenuButton" imageMso="ObjectSendToBack"     enabled="1"  />
+          <button id="BackOutl"    label="Outline"  onAction="ExecMenuButton" imageMso="ObjectSendToBack"     enabled="1"  />
           
           
           <separator id="grp_Main02"/>
@@ -32,7 +32,7 @@
            <button id="Redo" label="redo"   onAction="ExecMenuButton"   imageMso="Redo" enabled="1" />          
           
           <separator id="grp_Adhoc01"/>
-          <button id="PivotExcel" label="Table to Pivot" onAction="ExecMenuButton" imageMso="GroupInsertShapes" size="large" enabled="1" /> 
+          <button id="PivotExcel" label="Table to Pivot" onAction="ExecMenuButton" imageMso="PivotTableReport" size="large" enabled="1" /> 
           
           <separator id="grp_Adhoc02"/>
           
@@ -51,7 +51,7 @@
          
           <button id="UpdateDataAll" label="Update All Grids"   imageMso="AdpManageIndexes" onAction="ExecMenuButton"    enabled="1"  />
           <separator id="grp_AdditionalService01"/>
-          <button id="PowerPivotMM"      label="Power Pivot Model Manag."		onAction="ExecMenuButton"     imageMso="PivotDiagramRelayoutAll" size="large"  enabled="1" />
+          <button id="PowerPivotMM"      label="Power Pivot Model Manag."		onAction="ExecMenuButton"     imageMso="PrintPreviewShrinkOnePage" size="large"  enabled="1" />
 
           <button id="TableProp"   	label="Table Properties"    onAction="ExecMenuButton"     imageMso="SignatureLineInsert" enabled="1" />          
 

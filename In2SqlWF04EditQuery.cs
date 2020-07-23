@@ -18,7 +18,9 @@ namespace SqlEngine
 
         public In2SqlWF04EditQuery()
         {
-              vCurrTable = SqlEngine.currExcelApp.ActiveCell.ListObject;
+            
+
+            vCurrTable = SqlEngine.currExcelApp.ActiveCell.ListObject;
              
             if ((vCurrTable == null )  )
             {
@@ -27,6 +29,7 @@ namespace SqlEngine
             }
 
             InitializeComponent();
+            SqlEditor.Language = FastColoredTextBoxNS.Language.SQL;
 
             string vSql  = vCurrTable.QueryTable.CommandText;
              
@@ -37,11 +40,11 @@ namespace SqlEngine
              this.Text = "Sql Edit: " + vCurrTable.Name;
           //  this.TableName.Text =  vCurrObject.Name;
             SqlEditor_TextChanged( null, null);
-            
 
+            
         }
 
-        int colored = 1;
+      
 
         private void SqlEditTol_Click(object sender, EventArgs e)
         {
@@ -71,15 +74,20 @@ namespace SqlEngine
 
             else if (sender.ToString().Contains("Paste"))
             {
-                 colored = 0;
+                  
                 SqlEditor.Paste();
-                colored = 1;
+                
             }
 
             else if (sender.ToString().Contains("Execute"))
             {
+                SqlEditor.ReadOnly = true;
+                SQLEditToolStrip.Focus();
                 vCurrTable.QueryTable.CommandText = intSqlVBAEngine.setSqlLimit(intSqlVBAEngine.getOdbcNameFromObject(vCurrTable), SqlEditor.Text);
-                vCurrTable.Refresh();
+                intSqlVBAEngine.objRefreshHistory(vCurrTable);
+                SqlEditor.ReadOnly = false;
+               // SqlEditor.Focus();
+                // vCurrTable.Refresh();
             }
 
         }
@@ -103,75 +111,13 @@ namespace SqlEngine
 
         private void SqlEditor_TextChanged(object sender, EventArgs e)
         {
-            if (colored == 1)
-            {
-                // getting keywords/functions
-                string keywords = in2SqlLibrary.getMsSqlReserved();
+ 
+           
+        }
 
-                MatchCollection keywordMatches = Regex.Matches(SqlEditor.Text.ToUpper(), keywords);
-
-                // getting types/classes from the text 
-                string types = @"\b(Console)\b";
-                MatchCollection typeMatches = Regex.Matches(SqlEditor.Text, types);
-
-                // getting comments (inline or multiline)
-                string comments = @"(\/\/.+?$|\/\*.+?\*\/)";
-                MatchCollection commentMatches = Regex.Matches(SqlEditor.Text, comments, RegexOptions.Multiline);
-
-                // getting strings
-                string strings = "\".+?\"";
-                MatchCollection stringMatches = Regex.Matches(SqlEditor.Text, strings);
-
-                // saving the original caret position + forecolor
-                int originalIndex = SqlEditor.SelectionStart;
-                int originalLength = SqlEditor.SelectionLength;
-                Color originalColor = Color.Black;
-
-                // MANDATORY - focuses a label before highlighting (avoids blinking)
-                this.Focus();
-
-                // removes any previous highlighting (so modified words won't remain highlighted)
-                SqlEditor.SelectionStart = 0;
-                SqlEditor.SelectionLength = SqlEditor.Text.Length;
-                SqlEditor.SelectionColor = originalColor;
-
-                // scanning...
-                foreach (Match m in keywordMatches)
-                {
-                    SqlEditor.SelectionStart = m.Index;
-                    SqlEditor.SelectionLength = m.Length;
-                    SqlEditor.SelectionColor = Color.Blue;
-                }
-
-                foreach (Match m in typeMatches)
-                {
-                    SqlEditor.SelectionStart = m.Index;
-                    SqlEditor.SelectionLength = m.Length;
-                    SqlEditor.SelectionColor = Color.DarkCyan;
-                }
-
-                foreach (Match m in stringMatches)
-                {
-                    SqlEditor.SelectionStart = m.Index;
-                    SqlEditor.SelectionLength = m.Length;
-                    SqlEditor.SelectionColor = Color.Brown;
-                }
-
-                foreach (Match m in commentMatches)
-                {
-                    SqlEditor.SelectionStart = m.Index;
-                    SqlEditor.SelectionLength = m.Length;
-                    SqlEditor.SelectionColor = Color.Green;
-                }
-
-                // restoring the original colors, for further writing
-                SqlEditor.SelectionStart = originalIndex;
-                SqlEditor.SelectionLength = originalLength;
-                SqlEditor.SelectionColor = originalColor;
-
-                // giving back the focus
-                SqlEditor.Focus();
-            }
+        private void SqlEditor_Load(object sender, EventArgs e)
+        {
+            SqlEditor.Language = FastColoredTextBoxNS.Language.SQL;
         }
     }
 }

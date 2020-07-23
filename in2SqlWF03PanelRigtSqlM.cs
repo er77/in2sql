@@ -164,12 +164,15 @@ namespace SqlEngine
                 GetODbcRecords(rootNode, vIsUI);
                 treeODBC.Nodes.Add(rootNode);
 
-                TreeNode rootTable = new TreeNode("Excel".ToString(), 15, 15);
-                rootTable.Tag = "excel";
-                //  getExcelRecords(rootTable);
-                TreeNode vNodeExcelSheet = new TreeNode(" ".ToString(), 99, 99);
-                rootTable.Nodes.Add(vNodeExcelSheet);
-                treeODBC.Nodes.Add(rootTable);
+                TreeNode rootCloud = new TreeNode("Cloud".ToString(), 18, 18);
+                rootCloud.Tag = "cloud";
+                TreeNode tnClickHouse = new TreeNode("ClickHouse".ToString(), 19, 19);
+                tnClickHouse.Tag = "ClickHouse";
+                GetCloudRecords(tnClickHouse, "CloudCH");
+                rootCloud.Nodes.Add(tnClickHouse);
+
+                treeODBC.Nodes.Add(rootCloud);
+ 
 
             }
             catch (Exception er)
@@ -178,10 +181,36 @@ namespace SqlEngine
             }
         }
 
+
+        private void GetCloudRecords(TreeNode nodeToAddTo, string vCloudType)
+        {
+            try
+            {
+                foreach (var vCurrCloudList in in2sqlSvcCloud.vCloudList)
+                { 
+                    if (vCurrCloudList.CloudType.Contains(vCloudType))
+                        in2SqlRightPaneTreeTables.setODBCTreeLineSimple(nodeToAddTo, vCurrCloudList.CloudName, vCloudType+'$');
+                }                     
+                    return;                               
+            }
+            catch (Exception er)
+            {
+                In2SqlSvcTool.ExpHandler(er, "GetCloudRecords");
+            }
+        }
+
+
         private void GetODbcRecords(TreeNode nodeToAddTo, int vIsUI = 0)
         {
             try
             {
+
+                foreach (var vCurrCloudList in in2sqlSvcCloud.vCloudList)
+                {
+                    string vv = vCurrCloudList.CloudName;
+                }
+                
+
                 if (vIsUI == 0)
                 {
                     foreach (var vCurrvODBCList in In2SqlSvcODBC.vODBCList)
@@ -270,23 +299,7 @@ namespace SqlEngine
             }
         } 
 
-        private void RefreshExcel(TreeNode nodeToAddTo)
-        {
-            // intSqlVBAEngine.createExTable(miSelectNode.Parent.Parent.Text, miSelectNode.Text);
-            nodeToAddTo.Nodes.Clear();
 
-            foreach (var sheet in SqlEngine.currExcelApp.ActiveSheet.Parent.Worksheets)
-            {
-                TreeNode vNodeExcelSheet = new TreeNode(sheet.name, 16, 16);
-                nodeToAddTo.Nodes.Add(vNodeExcelSheet);
-                foreach (var vObj in sheet.ListObjects)
-                {
-                    TreeNode vNodeExcelObject = new TreeNode(vObj.name, 17, 17);
-                    vNodeExcelObject.Tag = "ExTable " + vObj.name;
-                    vNodeExcelSheet.Nodes.Add(vNodeExcelObject);
-                }
-            }
-        }
 
         private TreeNode fTN = null;
 
@@ -330,14 +343,7 @@ namespace SqlEngine
 
             return fTN; 
          }
-
-         
-
-        private void miRefreshExcel_Click(object sender, EventArgs e)
-        {            
-            RefreshExcel(miSelectNode); 
-        }
- 
+                  
 
         private void ExTableMenu_Click(object sender, EventArgs e)
         {
@@ -399,32 +405,6 @@ namespace SqlEngine
 
                     }
 
-                    if ((e.Button == MouseButtons.Right) & (e.Node.Tag.ToString().Contains("excel")))
-                    {
-                        contextMenuExcelRoot = createMenu (
-                                     e
-                                    , new String[] { "Refresh" }
-                                    , miRefreshExcel_Click
-                                    , contextMenuExcelRoot);
-                        return;
-                    }
-
-                    if ((e.Button == MouseButtons.Right) & (e.Node.Tag.ToString().Contains("ExTable")))
-                    {
-                        contextMenuExTable = createMenu(
-                                        e
-                                    , new String[] { "Rename", "Edit Sql", "Refresh", "Properties", "Delete" }
-                                    , ExTableMenu_Click
-                                    , contextMenuExTable);
-                        return;
-                    }
-
-                    if ((e.Button == MouseButtons.Left) & (e.Node.Tag.ToString().Contains("excel")))
-                    {
-                        RefreshExcel(e.Node);
-                        return;
-                    }
-
                     if ((e.Button == MouseButtons.Left) & (e.Node.Tag.ToString().Contains("ODBC$")))
                     {                        
                         in2SqlRightPaneTreeTables.getTablesAndViews(e);
@@ -432,6 +412,13 @@ namespace SqlEngine
                         return;
                     }
 
+                      if ((e.Button == MouseButtons.Left) & (e.Node.Tag.ToString().ToUpper().Contains("CLOUD")) & (e.Node.Tag.ToString().Contains("$")))
+                    {
+                        in2SqlRightPaneTreeCloud.getCloudTablesAndViews(e);
+                       //   sqlBuild.setLblConnectionName(e.Node.Text);
+                          return;
+                      }
+                     
                     if ((e.Button == MouseButtons.Right) & (e.Node.Tag.ToString().Contains("ODBC%")))
                     {
                         contextMenuOdbcError = createMenu(
@@ -446,8 +433,18 @@ namespace SqlEngine
                     {
                         if (e.Button == MouseButtons.Left | e.Node.Tag.ToString().Contains('$') )
                         {
-                            in2SqlRightPaneTreeTables.getColumnsandIndexes(e);
-                            return;
+                            if ( e.Node.Tag.ToString().Contains("CLD"))
+                            {
+                                in2SqlRightPaneTreeCloud.getColumnsAndIndexes(e);
+                                return;
+                            }
+                            else
+                            {
+                                in2SqlRightPaneTreeTables.getColumnsandIndexes(e);
+                                return;
+
+                            }
+
                         }
                         else if (e.Button == MouseButtons.Right)
                         {

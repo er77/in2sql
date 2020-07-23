@@ -6,6 +6,7 @@ using System.Threading;
 using System.Windows.Forms;
 using System.Security.Cryptography;
 using System.IO;
+using System.Net;
 
 namespace SqlEngine
 {
@@ -175,6 +176,75 @@ namespace SqlEngine
             {
                 ExpHandler(e, "RunCmdLauncher.objException");
             }
+
+        }
+
+        public static string HttpGet(string vHttpUrl)
+        {
+            try
+            {
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(vHttpUrl);
+                request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+
+                using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
+                using (Stream stream = response.GetResponseStream())
+                using (StreamReader reader = new StreamReader(stream))
+                {
+                    return reader.ReadToEnd();                   
+                }
+               
+            }
+            catch (Exception e)
+            {
+                ExpHandler(e, "In2SqlSvcTool.HttpGet");
+                return null;
+            }
+
+        }
+
+        public static IEnumerable<String> CloudSplitText(string vHttpText)
+        {
+            String[] vSplittedText = vHttpText.Split('\n');
+            foreach (String vCurrLine in vSplittedText)
+            {
+                yield return vCurrLine;//.Replace('\r', "");
+            }
+        }
+
+
+        public static IEnumerable<String> HttpGetArray(string vHttpUrl)
+        {
+            
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(vHttpUrl);
+                request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+
+                using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
+                using (Stream stream = response.GetResponseStream())
+                using (StreamReader readStream = new StreamReader(stream))
+                { 
+                    Char[] vCharReadBuf = new Char[256];
+                    int vReadCharCount = 1; //readStream.Read(vCharReadBuf, 0, 256);
+                    string vStrBuff="";
+                    while (vReadCharCount > 0)
+                    {
+                        vReadCharCount = readStream.Read(vCharReadBuf, 0, 256);
+                        if (vReadCharCount > 0)
+                        {
+                            vStrBuff = vStrBuff + new String(vCharReadBuf, 0, vReadCharCount);
+                            String[] vStrArr = vStrBuff.Split('\n');
+                            if (vStrArr.Count() > 0)
+                            {
+                                for (int i = 0; i < (vStrArr.Count()-1); i++)
+                                {
+                                    yield return vStrArr[i];
+                                }
+                                vStrBuff = vStrArr[vStrArr.Count()-1];
+                            }
+                        }
+                        
+                    }
+                }
+            
 
         }
     }

@@ -26,6 +26,7 @@ namespace SqlEngine
         {
             public List<String> objColumns;
             public List<String> objIndexes;
+            public List<String> objDependencies;
             public String ObjName;
         }
 
@@ -277,8 +278,24 @@ namespace SqlEngine
 
         public static IEnumerable<ObjectsAndProperties> getObjectProperties(string vOdbcName, string vObjName)
         {
-            string vSql = in2SqlLibrary.getSQLTableColumn(getODBCProperties(vOdbcName, "DBType"));
-            vSql = vSql.Replace("%TNAME%", vObjName);
+            string vDBType = getODBCProperties(vOdbcName, "DBType");
+            string vSql = in2SqlLibrary.getSQLTableColumn(vDBType);
+
+            var vTb1 = vObjName.Split('.');
+
+            if (vDBType.Contains("ORACLE"))
+            {                
+                vSql = vSql.Replace("%TNAME%", vTb1[1]);
+            }
+              else if (vDBType.Contains("CH"))
+            {
+                vSql = vSql.Replace("%TNAME%", vTb1[1]);
+                vSql = vSql.Replace("%TOWNER%", vTb1[0]);
+            }
+              else
+            {
+                vSql = vSql.Replace("%TNAME%", vObjName);
+            }
 
             var vObjects = SqlReadDataValue(vOdbcName, vSql);
             ObjectsAndProperties vObject = new ObjectsAndProperties();
@@ -290,8 +307,21 @@ namespace SqlEngine
                 vObject.objColumns.Add(vCurrObject);
             }
 
-            vSql = in2SqlLibrary.getSQLIndexes(getODBCProperties(vOdbcName, "DBType"));
-            vSql = vSql.Replace("%TNAME%", vObjName);
+            vSql = in2SqlLibrary.getSQLIndexes(vDBType);
+
+            if (vDBType.Contains("ORACLE"))
+            {
+                vSql = vSql.Replace("%TNAME%", vTb1[1]);
+            }
+              else if (vDBType.Contains("CH"))
+            {
+                vSql = vSql.Replace("%TNAME%", vTb1[1]);
+                vSql = vSql.Replace("%TOWNER%", vTb1[0]);
+            }
+            {
+                vSql = vSql.Replace("%TNAME%", vObjName);
+            }
+
             vObjects = SqlReadDataValue(vOdbcName, vSql);
             vObject.objIndexes = new List<string>();
 
@@ -299,6 +329,24 @@ namespace SqlEngine
             {
                 vObject.objIndexes.Add(vCurrObject);
             }
+
+
+            vSql = in2SqlLibrary.getSQLDependencies(vDBType);
+            if (vDBType.Contains("ORACLE"))
+            {
+                vSql = vSql.Replace("%TOWNER%", vTb1[1]);
+                vSql = vSql.Replace("%TNAME%", vTb1[1]);
+
+                vObjects = SqlReadDataValue(vOdbcName, vSql);
+                vObject.objDependencies = new List<string>();
+
+                foreach (var vCurrObject in vObjects)
+                {
+                    vObject.objDependencies.Add(vCurrObject);
+                }
+
+            }            
+            
 
             yield return vObject;
         }

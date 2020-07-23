@@ -33,14 +33,14 @@
     <PublishUrl>C:\MyProject\SqlEngine_Setup\Publish\</PublishUrl>
     <InstallUrl />
     <TargetCulture>en</TargetCulture>
-    <ApplicationVersion>1.0.0.3</ApplicationVersion>
+    <ApplicationVersion>1.0.0.13</ApplicationVersion>
     <AutoIncrementApplicationRevision>true</AutoIncrementApplicationRevision>
-    <UpdateEnabled>true</UpdateEnabled>
-    <UpdateInterval>7</UpdateInterval>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateInterval>0</UpdateInterval>
     <UpdateIntervalUnits>days</UpdateIntervalUnits>
     <ProductName>SqlEngine</ProductName>
-    <PublisherName />
-    <SupportUrl />
+    <PublisherName>er%40essbase.ru</PublisherName>
+    <SupportUrl>https://t.me/in2sql</SupportUrl>
     <FriendlyName>SqlEngine</FriendlyName>
     <OfficeApplicationDescription />
     <LoadBehavior>3</LoadBehavior>
@@ -106,18 +106,22 @@
       Warning level for the compiler.
   -->
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
-    <DefineConstants>$(DefineConstants);TRACE</DefineConstants>
+    <DefineConstants>DEBUG;VSTO40;TRACE</DefineConstants>
     <WarningLevel>4</WarningLevel>
+    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <!--
     This section specifies references for the project.
   -->
   <ItemGroup>
     <Reference Include="Accessibility" />
+    <Reference Include="FastColoredTextBox, Version=2.16.24.0, Culture=neutral, PublicKeyToken=fb8aa12b994ef61b, processorArchitecture=MSIL">
+      <HintPath>packages\FCTB.2.16.24\lib\FastColoredTextBox.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Office.Interop.Excel, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
@@ -177,6 +181,8 @@
     <Compile Include="in2SqlLibrary.cs" />
     <Compile Include="in2SqlRegistry.cs" />
     <Compile Include="In2SqlRibbon.cs" />
+    <Compile Include="in2SqlRightPaneTreeCloud.cs" />
+    <Compile Include="in2sqlSvcCloud.cs" />
     <Compile Include="In2SqlSvcUndoManagment.cs" />
     <Compile Include="in2SqlWF03PanelRigtSqlM.cs">
       <SubType>UserControl</SubType>
@@ -230,6 +236,12 @@
     <Compile Include="in2SqlWF08About.Designer.cs">
       <DependentUpon>in2SqlWF08About.cs</DependentUpon>
     </Compile>
+    <Compile Include="in2SqlWF09CloudConnectionEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="in2SqlWF09CloudConnectionEditor.Designer.cs">
+      <DependentUpon>in2SqlWF09CloudConnectionEditor.cs</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -257,6 +269,9 @@
     <EmbeddedResource Include="in2SqlWF08About.resx">
       <DependentUpon>in2SqlWF08About.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="in2SqlWF09CloudConnectionEditor.resx">
+      <DependentUpon>in2SqlWF09CloudConnectionEditor.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -266,6 +281,9 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <None Include="Anthony.pfx" />
+    <None Include="er.pfx" />
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -284,6 +302,8 @@
       <DependentUpon>SqlEngine.Designer.xml</DependentUpon>
     </Compile>
     <AppDesigner Include="Properties\" />
+    <None Include="SqlEngine_1_TemporaryKey.pfx" />
+    <None Include="SqlEngine_2_TemporaryKey.pfx" />
     <None Include="SqlEngine_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
@@ -300,10 +320,10 @@
     <SignManifests>true</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>SqlEngine_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestKeyFile>er.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>70091F1E55E6B0F3476F4365683A6EBDF8610475</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>DE91676FCFE49B01EFD08A9385C31987ACA75E53</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
@@ -327,6 +347,9 @@
   <PropertyGroup>
     <ApplicationIcon>ico.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
   <!-- Include the build rules for a C# project. -->
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- Include additional build rules for an Office application add-in. -->
@@ -337,7 +360,7 @@
       <FlavorProperties GUID="{BAA0C2D2-18E2-41B9-852F-F413020CAA33}">
         <ProjectProperties HostName="Excel" HostPackage="{29A7B9D7-A7F1-4328-8EF0-6B2D1A56B2C1}" OfficeVersion="15.0" VstxVersion="4.0" ApplicationType="Excel" Language="cs" TemplatesPath="" DebugInfoExeName="#Software\Microsoft\Office\16.0\Excel\InstallRoot\Path#excel.exe" DebugInfoCommandLine="/x" AddItemTemplatesGuid="{51063C3A-E220-4D12-8922-BDA915ACD783}" />
         <Host Name="Excel" GeneratedCodeNamespace="SqlEngine" PublishedHash="69C324AB27932AA2FBF2B7EA72250886FF164DE6" IconIndex="0">
-          <HostItem Name="ThisAddIn" Code="SqlEngine.cs" CanonicalName="AddIn" CanActivate="false" IconIndex="1" Blueprint="SqlEngine.Designer.xml" GeneratedCode="SqlEngine.Designer.cs" PublishedHash="A0F77ED2249F0FB5BA4C22AB1E16A2C773DDB024" />
+          <HostItem Name="ThisAddIn" Code="SqlEngine.cs" CanonicalName="AddIn" PublishedHash="A0F77ED2249F0FB5BA4C22AB1E16A2C773DDB024" CanActivate="false" IconIndex="1" Blueprint="SqlEngine.Designer.xml" GeneratedCode="SqlEngine.Designer.cs" />
         </Host>
       </FlavorProperties>
     </VisualStudio>

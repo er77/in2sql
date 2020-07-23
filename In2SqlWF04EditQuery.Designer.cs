@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(In2SqlWF04EditQuery));
             this.SQLEditToolStrip = new System.Windows.Forms.ToolStrip();
             this.newToolStripButton = new System.Windows.Forms.ToolStripButton();
@@ -40,8 +41,9 @@
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.Execute = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
-            this.SqlEditor = new System.Windows.Forms.RichTextBox();
+            this.SqlEditor = new FastColoredTextBoxNS.FastColoredTextBox();
             this.SQLEditToolStrip.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.SqlEditor)).BeginInit();
             this.SuspendLayout();
             // 
             // SQLEditToolStrip
@@ -151,14 +153,34 @@
             // 
             // SqlEditor
             // 
+            this.SqlEditor.AutoCompleteBracketsList = new char[] {
+        '(',
+        ')',
+        '{',
+        '}',
+        '[',
+        ']',
+        '\"',
+        '\"',
+        '\'',
+        '\''};
+            this.SqlEditor.AutoScrollMinSize = new System.Drawing.Size(27, 14);
+            this.SqlEditor.BackBrush = null;
+            this.SqlEditor.CharHeight = 14;
+            this.SqlEditor.CharWidth = 8;
+            this.SqlEditor.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.SqlEditor.DisabledColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))));
             this.SqlEditor.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.SqlEditor.Font = new System.Drawing.Font("Calibri", 11.25F);
+            this.SqlEditor.IsReplaceMode = false;
             this.SqlEditor.Location = new System.Drawing.Point(0, 25);
             this.SqlEditor.Name = "SqlEditor";
+            this.SqlEditor.Paddings = new System.Windows.Forms.Padding(0);
+            this.SqlEditor.SelectionColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(255)))));
+            this.SqlEditor.ServiceColors = ((FastColoredTextBoxNS.ServiceColors)(resources.GetObject("SqlEditor.ServiceColors")));
             this.SqlEditor.Size = new System.Drawing.Size(481, 440);
-            this.SqlEditor.TabIndex = 4;
-            this.SqlEditor.Text = "";
-            this.SqlEditor.TextChanged += new System.EventHandler(this.SqlEditor_TextChanged);
+            this.SqlEditor.TabIndex = 3;
+            this.SqlEditor.Zoom = 100;
+            this.SqlEditor.Load += new System.EventHandler(this.SqlEditor_Load);
             // 
             // In2SqlWF04EditQuery
             // 
@@ -174,6 +196,7 @@
             this.Text = "Sql Editor";
             this.SQLEditToolStrip.ResumeLayout(false);
             this.SQLEditToolStrip.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.SqlEditor)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -192,6 +215,6 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripButton Execute;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
-        private System.Windows.Forms.RichTextBox SqlEditor;
+        private FastColoredTextBoxNS.FastColoredTextBox SqlEditor;
     }
 }

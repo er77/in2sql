@@ -78,6 +78,8 @@
             this.ODBCImages.Images.SetKeyName(15, "15_excel.png");
             this.ODBCImages.Images.SetKeyName(16, "16_excel_sheet.png");
             this.ODBCImages.Images.SetKeyName(17, "17_excel_table.png");
+            this.ODBCImages.Images.SetKeyName(18, "22_cloud.png");
+            this.ODBCImages.Images.SetKeyName(19, "23_CH.png");
             // 
             // contextMenuTable
             // 

@@ -33,9 +33,7 @@
             this.contextMenuSqlConnections = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.SqlConnectionsToolStripDropDown = new System.Windows.Forms.ToolStripDropDownButton();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.splitContainer2 = new System.Windows.Forms.SplitContainer();
-            this.LineNumberTextBox = new System.Windows.Forms.RichTextBox();
-            this.SqlDocument = new System.Windows.Forms.RichTextBox();
+            this.ConnName = new System.Windows.Forms.Label();
             this.toolSqlConnections = new System.Windows.Forms.ToolStrip();
             this.newToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.openToolStripButton = new System.Windows.Forms.ToolStripButton();
@@ -53,25 +51,23 @@
             this.SqlDataResult = new System.Windows.Forms.DataGridView();
             this.SQLHistory = new System.Windows.Forms.TabPage();
             this.SqlHistoryLog = new System.Windows.Forms.RichTextBox();
-            this.ConnName = new System.Windows.Forms.Label();
+            this.SqlDocument = new FastColoredTextBoxNS.FastColoredTextBox();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).BeginInit();
-            this.splitContainer2.Panel1.SuspendLayout();
-            this.splitContainer2.Panel2.SuspendLayout();
-            this.splitContainer2.SuspendLayout();
             this.toolSqlConnections.SuspendLayout();
             this.SqlResult.SuspendLayout();
             this.SQLDataGrid.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SqlDataResult)).BeginInit();
             this.SQLHistory.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.SqlDocument)).BeginInit();
             this.SuspendLayout();
             // 
             // contextMenuSqlConnections
             // 
             this.contextMenuSqlConnections.Name = "contextMenuSqlConnections";
+            this.contextMenuSqlConnections.OwnerItem = this.SqlConnectionsToolStripDropDown;
             this.contextMenuSqlConnections.Size = new System.Drawing.Size(61, 4);
             this.contextMenuSqlConnections.Click += new System.EventHandler(this.Connection_Click);
             // 
@@ -96,8 +92,8 @@
             // 
             // splitContainer1.Panel1
             // 
+            this.splitContainer1.Panel1.Controls.Add(this.SqlDocument);
             this.splitContainer1.Panel1.Controls.Add(this.ConnName);
-            this.splitContainer1.Panel1.Controls.Add(this.splitContainer2);
             this.splitContainer1.Panel1.Controls.Add(this.toolSqlConnections);
             // 
             // splitContainer1.Panel2
@@ -107,49 +103,13 @@
             this.splitContainer1.SplitterDistance = 480;
             this.splitContainer1.TabIndex = 7;
             // 
-            // splitContainer2
+            // ConnName
             // 
-            this.splitContainer2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainer2.Location = new System.Drawing.Point(0, 25);
-            this.splitContainer2.Name = "splitContainer2";
-            // 
-            // splitContainer2.Panel1
-            // 
-            this.splitContainer2.Panel1.Controls.Add(this.LineNumberTextBox);
-            // 
-            // splitContainer2.Panel2
-            // 
-            this.splitContainer2.Panel2.Controls.Add(this.SqlDocument);
-            this.splitContainer2.Size = new System.Drawing.Size(591, 455);
-            this.splitContainer2.SplitterDistance = 197;
-            this.splitContainer2.TabIndex = 7;
-            // 
-            // LineNumberTextBox
-            // 
-            this.LineNumberTextBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.LineNumberTextBox.Cursor = System.Windows.Forms.Cursors.PanNE;
-            this.LineNumberTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.LineNumberTextBox.Location = new System.Drawing.Point(0, 0);
-            this.LineNumberTextBox.Name = "LineNumberTextBox";
-            this.LineNumberTextBox.ReadOnly = true;
-            this.LineNumberTextBox.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.None;
-            this.LineNumberTextBox.Size = new System.Drawing.Size(197, 455);
-            this.LineNumberTextBox.TabIndex = 5;
-            this.LineNumberTextBox.Text = "";
-            this.LineNumberTextBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.LineNumberTextBox_MouseDown);
-            // 
-            // SqlDocument
-            // 
-            this.SqlDocument.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.SqlDocument.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.SqlDocument.Font = new System.Drawing.Font("Calibri", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.SqlDocument.Location = new System.Drawing.Point(0, 0);
-            this.SqlDocument.Name = "SqlDocument";
-            this.SqlDocument.Size = new System.Drawing.Size(390, 455);
-            this.SqlDocument.TabIndex = 4;
-            this.SqlDocument.Text = "";
-            this.SqlDocument.VScroll += new System.EventHandler(this.SqlDocument_VScroll);
-            this.SqlDocument.TextChanged += new System.EventHandler(this.SqlDocument_TextChanged);
+            this.ConnName.AutoSize = true;
+            this.ConnName.Location = new System.Drawing.Point(262, 5);
+            this.ConnName.Name = "ConnName";
+            this.ConnName.Size = new System.Drawing.Size(0, 13);
+            this.ConnName.TabIndex = 8;
             // 
             // toolSqlConnections
             // 
@@ -327,13 +287,39 @@
             this.SqlHistoryLog.TabIndex = 1;
             this.SqlHistoryLog.Text = "";
             // 
-            // ConnName
+            // SqlDocument
             // 
-            this.ConnName.AutoSize = true;
-            this.ConnName.Location = new System.Drawing.Point(262, 5);
-            this.ConnName.Name = "ConnName";
-            this.ConnName.Size = new System.Drawing.Size(0, 13);
-            this.ConnName.TabIndex = 8;
+            this.SqlDocument.AutoCompleteBracketsList = new char[] {
+        '(',
+        ')',
+        '{',
+        '}',
+        '[',
+        ']',
+        '\"',
+        '\"',
+        '\'',
+        '\''};
+            this.SqlDocument.AutoScrollMinSize = new System.Drawing.Size(179, 14);
+            this.SqlDocument.AutoSize = true;
+            this.SqlDocument.BackBrush = null;
+            this.SqlDocument.CharHeight = 14;
+            this.SqlDocument.CharWidth = 8;
+            this.SqlDocument.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.SqlDocument.DisabledColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))));
+            this.SqlDocument.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.SqlDocument.Font = new System.Drawing.Font("Courier New", 9.75F);
+            this.SqlDocument.IsReplaceMode = false;
+            this.SqlDocument.Location = new System.Drawing.Point(0, 25);
+            this.SqlDocument.Name = "SqlDocument";
+            this.SqlDocument.Paddings = new System.Windows.Forms.Padding(0);
+            this.SqlDocument.SelectionColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(255)))));
+            this.SqlDocument.ServiceColors = ((FastColoredTextBoxNS.ServiceColors)(resources.GetObject("SqlDocument.ServiceColors")));
+            this.SqlDocument.Size = new System.Drawing.Size(591, 455);
+            this.SqlDocument.TabIndex = 9;
+            this.SqlDocument.Text = "fastColoredTextBox1";
+            this.SqlDocument.Zoom = 100;
+            this.SqlDocument.Load += new System.EventHandler(this.SqlDocument_Load);
             // 
             // in2SqlWF05SqlEngine
             // 
@@ -351,16 +337,13 @@
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
-            this.splitContainer2.Panel1.ResumeLayout(false);
-            this.splitContainer2.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
-            this.splitContainer2.ResumeLayout(false);
             this.toolSqlConnections.ResumeLayout(false);
             this.toolSqlConnections.PerformLayout();
             this.SqlResult.ResumeLayout(false);
             this.SQLDataGrid.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.SqlDataResult)).EndInit();
             this.SQLHistory.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.SqlDocument)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -374,8 +357,6 @@
         private System.Windows.Forms.TabPage SQLHistory;
         private System.Windows.Forms.RichTextBox SqlHistoryLog;
         private System.Windows.Forms.ToolStripDropDownButton SqlConnectionsToolStripDropDown;
-        private System.Windows.Forms.RichTextBox LineNumberTextBox;
-        private System.Windows.Forms.RichTextBox SqlDocument;
         private System.Windows.Forms.ToolStrip toolSqlConnections;
         private System.Windows.Forms.ToolStripButton newToolStripButton;
         private System.Windows.Forms.ToolStripButton openToolStripButton;
@@ -388,7 +369,7 @@
         private System.Windows.Forms.ToolStripButton toolSqlRun;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private System.Windows.Forms.ToolStripSplitButton SaveToExTable;
-        private System.Windows.Forms.SplitContainer splitContainer2;
         private System.Windows.Forms.Label ConnName;
+        private FastColoredTextBoxNS.FastColoredTextBox SqlDocument;
     }
 }

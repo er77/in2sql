@@ -187,7 +187,7 @@ namespace SqlEngine
         {
             if (ribbon != null)
                 ribbon.ActivateTab("SqlEngine");
-
+            In2SqlSvcTool.RunGarbageCollector();
         }
 
         public In2SqlRibbon()
@@ -353,7 +353,9 @@ namespace SqlEngine
                         break;
 
                     case "About":
-                        showAbout();
+                        //showAbout();
+                       var frmshowAbout = new in2SqlWF09CloudConnectionEditor();
+                        frmshowAbout.Show();
                         ActivateTab();
                         break;
 

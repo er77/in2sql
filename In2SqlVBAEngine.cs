@@ -11,14 +11,15 @@ using System.Windows.Forms;
 using Microsoft.Office.Tools.Excel;
 using Microsoft.Office.Interop.Excel;
 using System.Data.Odbc;
+using System.Windows.Forms.VisualStyles;
 
 namespace SqlEngine
 {
     class intSqlVBAEngine
     {
 
-        private static bool isRefresh = false;
-
+        public static bool isRefresh = false;
+        // intSqlVBAEngine.isRefresh = true;
 
         //Microsoft.Office.Interop.Excel.ListObject
         public struct InsertList
@@ -338,9 +339,7 @@ namespace SqlEngine
                                                , Destination: vCurrWorkSheet.Cells(vActivCell.Row, vActivCell.Column));
 
                         table.Name = "In2Sql|" + vODBC + "|" + vTableName;
-                        table.Comment = vTableName;
-                        table.QueryTable.AfterRefresh += QueryTable_AfterRefresh;
-                        table.TableStyle = "TableStyleLight13";
+                        table.Comment = vTableName; 
                         objRefreshHistory(table);
                         GetSelectedTab();
                         return;
@@ -349,7 +348,7 @@ namespace SqlEngine
             System.Windows.Forms.MessageBox.Show(" Please select empty area  in Excel data grid");
         }
 
-        /***********************************/
+        /*****************333******************/
 
         private static void CurrExcelApp_SheetChange(object Sh, Excel.Range vRange)
         {
@@ -421,6 +420,7 @@ namespace SqlEngine
                         using (OdbcCommand cmnd = new OdbcCommand(vInsert, conn))
                             try
                             {
+                                isRefresh = true;
                                 cmnd.ExecuteNonQuery();
                             }
                             catch (Exception e)
@@ -451,10 +451,8 @@ namespace SqlEngine
         private static void QueryTable_AfterRefresh(bool Success)
         {
             var vActivCell = SqlEngine.currExcelApp.ActiveCell;
-
-            GetSelectedTab();// throw new NotImplementedException();    
-                             //SqlEngine.currExcelApp.EnableEvents = true;
-            isRefresh = false;
+            isRefresh = true; 
+          
             if ((vActivCell.ListObject == null) == false)
             {
                 for (int i = 1; i < vActivCell.ListObject.ListColumns.Count + 1; i++)
@@ -463,6 +461,7 @@ namespace SqlEngine
                     vClmName = vClmName.ToUpper();
                     if (vClmName.Contains("DATE"))
                     {
+                        isRefresh = true;
                         vActivCell.ListObject.ListColumns[i].Range.NumberFormat = "yyyy.mm.dd hh:mm:ss";
                     }
                 } /*************************888888*/
@@ -471,10 +470,9 @@ namespace SqlEngine
 
                 deleteUpdateList();
             }
+            isRefresh = false;
+            GetSelectedTab();
         }
-
-
-
 
 
         public static void RibbonKeepOnly()
@@ -491,7 +489,7 @@ namespace SqlEngine
                                 + " and " + vCurrWorkSheet.Cells(vActivCell.ListObject.Range.Row, vActivCell.Column).Value
                                 + "= '" + vActivCell.Value + "'";
 
-                vActivCell.ListObject.QueryTable.CommandText = setSqlLimit(getOdbcNameFromCell(), vSql);
+                vActivCell.ListObject.QueryTable.CommandText =   vSql; 
                 objRefreshHistory(vActivCell.ListObject);
 
                 //  SqlEngine.currExcelApp.SendKeys("%YQA%");
@@ -514,10 +512,9 @@ namespace SqlEngine
                                 + " and " + vCurrWorkSheet.Cells(vActivCell.ListObject.Range.Row, vActivCell.Column).Value
                                + " <> '" + vActivCell.Value + "'";
 
-                vActivCell.ListObject.QueryTable.CommandText = setSqlLimit(getOdbcNameFromCell(), vSql);
+                vActivCell.ListObject.QueryTable.CommandText =   vSql ;                
+                objRefreshHistory(vActivCell.ListObject); 
 
-                objRefreshHistory(vActivCell.ListObject);
-                //  SqlEngine.currExcelApp.SendKeys("%NV%");
                 return;
             }
             GetSelectedTab();
@@ -534,11 +531,7 @@ namespace SqlEngine
                 {
                     foreach (Microsoft.Office.Interop.Excel.ListObject vTable in vCurrWorkSheet.ListObjects)
                     {
-                        vTable.QueryTable.CommandText = setSqlLimit(getOdbcNameFromObject(vTable.QueryTable.Connection), vTable.QueryTable.CommandText);
-                        In2SqlSvcTool.addSqlLog(vTable.QueryTable.CommandText);
-                        vTable.TableStyle = "TableStyleLight13";
-                        vTable.QueryTable.AfterRefresh += QueryTable_AfterRefresh;
-                        vTable.Refresh();
+                        objRefreshHistory(vTable); 
                     }
                     foreach (var vTable in vCurrWorkSheet.PivotTables())
                     {
@@ -551,63 +544,75 @@ namespace SqlEngine
             GetSelectedTab();
         }
 
-        public static void objRefreshHistory(Microsoft.Office.Interop.Excel.ListObject vCurrObject)
+        public static void objRefreshHistory(Microsoft.Office.Interop.Excel.ListObject vCurrObject, int vIsUndoList= 1 )
         {
             // SqlEngine.currExcelApp.EnableEvents = false;
+            vCurrObject.QueryTable.CommandText = setSqlLimit(getOdbcNameFromObject(vCurrObject.QueryTable.Connection), vCurrObject.QueryTable.CommandText);
+           
+                In2SqlSvcTool.addSqlLog(vCurrObject.QueryTable.CommandText);
 
-            isRefresh = true;
-            vCurrObject.QueryTable.AfterRefresh += QueryTable_AfterRefresh;
-            In2SqlSvcTool.addSqlLog(vCurrObject.QueryTable.CommandText);
-            vCurrObject.Refresh();
-            In2SqlSvcUndoManagment.addToUndoList(vCurrObject.Name, vCurrObject.QueryTable.CommandText);
+            objRefresh(vCurrObject);
+            if (vIsUndoList == 1)
+                In2SqlSvcUndoManagment.addToUndoList(vCurrObject.Name, vCurrObject.QueryTable.CommandText);
 
         }
 
+        public static void objRefresh(Microsoft.Office.Interop.Excel.ListObject vCurrObject)
+        {
+            isRefresh = true;
+            vCurrObject.QueryTable.AfterRefresh += QueryTable_AfterRefresh;            
+            vCurrObject.Refresh();
+            vCurrObject.TableStyle = "TableStyleLight13";
+        }
 
 
         public static void Undo()
         {
             try
-            {
+            {               
                 var vActivCell = SqlEngine.currExcelApp.ActiveCell;
-                if ((vActivCell.ListObject == null) == false)
+                if (vActivCell.ListObject == null)
                 {
+                    MessageBox.Show(" Please,  select cell from the table", " Refresh error");
+                    return;
+                }
+ 
                     string vSql = In2SqlSvcUndoManagment.getLastSqlActionUndo(vActivCell.ListObject.Name);
                     if ((vSql == null) == false)
                     {
-                        vActivCell.ListObject.QueryTable.CommandText = setSqlLimit(getOdbcNameFromCell(), vSql);
-                        In2SqlSvcTool.addSqlLog(vActivCell.ListObject.QueryTable.CommandText);
-                        vActivCell.ListObject.QueryTable.AfterRefresh += QueryTable_AfterRefresh;
-                        vActivCell.ListObject.Refresh();
+                        vActivCell.ListObject.QueryTable.CommandText = vSql;                                             
+                        objRefreshHistory(vActivCell.ListObject,0);                      
                     }
 
                     GetSelectedTab();
+                  
                     return;
-                }
-                MessageBox.Show(" Please,  select cell from the table", " Refresh error");
+               
             }
             catch
             {
                 MessageBox.Show(" Please, select cell from the table", " Refresh error");
             }
-            GetSelectedTab();
+            
         }
 
         public static void Redo()
         {
             try
             {
+               
                 var vActivCell = SqlEngine.currExcelApp.ActiveCell;
                 if ((vActivCell.ListObject == null) == false)
                 {
                     string vSql = In2SqlSvcUndoManagment.getLastSqlActionRedo(vActivCell.ListObject.Name);
                     if ((vSql == null) == false)
                     {
-                        vActivCell.ListObject.QueryTable.CommandText = setSqlLimit(getOdbcNameFromCell(), vSql);
-                        In2SqlSvcTool.addSqlLog(vActivCell.ListObject.QueryTable.CommandText);
-                        vActivCell.ListObject.Refresh();
+                        vActivCell.ListObject.QueryTable.CommandText = vSql;
+                        objRefreshHistory(vActivCell.ListObject, 0);
+
                     }
                     GetSelectedTab();
+                    
                     return;
                 }
                 MessageBox.Show(" Please,  select cell from the table", " Refresh error");
@@ -628,12 +633,8 @@ namespace SqlEngine
                 var vActivCell = SqlEngine.currExcelApp.ActiveCell;
 
                 if ((vActivCell.ListObject == null) == false)
-                {
-                    vActivCell.ListObject.QueryTable.CommandText = setSqlLimit(getOdbcNameFromCell(), vActivCell.ListObject.QueryTable.CommandText);
-                    In2SqlSvcTool.addSqlLog(vActivCell.ListObject.QueryTable.CommandText);
-                    vActivCell.ListObject.TableStyle = "TableStyleLight13";
-                    vActivCell.ListObject.QueryTable.AfterRefresh += QueryTable_AfterRefresh;
-                    vActivCell.ListObject.Refresh();
+                { 
+                    objRefreshHistory(vActivCell.ListObject);  
                     return;
                 }
 
@@ -662,21 +663,8 @@ namespace SqlEngine
             string vSql = RemoveSqlLimit(vActivCell.ListObject.QueryTable.CommandText);
             createPivotTable(getOdbcNameFromCell(), In2SqlSvcTool.GetHash(vSql), vSql);
 
-            /* // SqlEngine.currExcelApp.SendKeys("%NV%");
-             var vActivCell = SqlEngine.currExcelApp.ActiveCell;
-              SqlEngine.currExcelApp.ActiveSheet.PivotTableWizard
-                 (// SourceType: Excel.XlPivotTableSourceType.xlExternal,
-                 //  SourceData: vActivCell.ListObject.QueryTable.CommandText,
-                   TableName: "pvt_"+ vActivCell.ListObject.Name,
-                   BackgroundQuery: (1 == 1),
-                   OptimizeCache :  (1 == 1),
-                   Connection: vActivCell.ListObject.QueryTable.Connection
-                   );
-             //SqlEngine.currExcelApp.Dialogs[Excel.XlBuiltInDialog.xlDialogRecommendedPivotTables].Show();
-             // SqlEngine.currExcelApp.MenuBars
-             //xlDialogPivotTableWizard
-             //  In2SqlRibbon.ActivateTab();
-             */
+            GetSelectedTab();
+
         }
 
         public static void runTableProperties()
@@ -687,7 +675,7 @@ namespace SqlEngine
             {
                 SqlEngine.currExcelApp.ScreenUpdating = false;
 
-                SqlEngine.currExcelApp.SendKeys("%A%PS");
+                SqlEngine.currExcelApp.SendKeys("%A%P%S");
                 SqlEngine.currExcelApp.SendKeys("+");
                 SqlEngine.currExcelApp.CommandBars.ReleaseFocus();
 
@@ -696,7 +684,7 @@ namespace SqlEngine
             else
                 MessageBox.Show(" Please, select  the external table", " Refresh error");
 
-
+            GetSelectedTab();
         }
 
         public static void runSqlProperties()
@@ -720,9 +708,10 @@ namespace SqlEngine
         public static void GetSelectedTab ()
         {
             SqlEngine.currExcelApp.ScreenUpdating = false;
-            SqlEngine.currExcelApp.SendKeys("%YQA");
-            SqlEngine.currExcelApp.SendKeys("%");
-            SqlEngine.currExcelApp.CommandBars.ReleaseFocus();//CommandBars.ReleaseFocus 
+             SqlEngine.currExcelApp.SendKeys("%YQA");
+             SqlEngine.currExcelApp.SendKeys("%");
+             SqlEngine.currExcelApp.CommandBars.ReleaseFocus();//CommandBars.ReleaseFocus 
+             
             SqlEngine.currExcelApp.ScreenUpdating = true;
         }
         //

@@ -19,15 +19,9 @@ namespace SqlEngine
             InitializeComponent();
 
             ConnectionDropDownMenu();
+            SqlDocument.Language = FastColoredTextBoxNS.Language.SQL;
 
 
-                LineNumberTextBox.Width = 10;
-
-            // now add each line number to LineNumberTextBox upto last line 
-
-            this.splitContainer2.SplitterDistance = 10;
-            this.splitContainer2.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
-            
         }
 
         private void ConnectionDropDownMenu()
@@ -47,61 +41,12 @@ namespace SqlEngine
         {
             ConnName.Text = sender.ToString();
         }
-
-
-
-        public void AddLineNumbers()
-        {
-            // create & set Point pt to (0,0)    
-            Point pt = new Point(0, 0);
-            // get First Index & First Line from SqlDocument    
-            int First_Index = SqlDocument.GetCharIndexFromPosition(pt);
-            int First_Line = SqlDocument.GetLineFromCharIndex(First_Index);
-            // set X & Y coordinates of Point pt to ClientRectangle Width & Height respectively    
-            pt.X = ClientRectangle.Width;
-            pt.Y = ClientRectangle.Height;
-            // get Last Index & Last Line from SqlDocument    
-            int Last_Index = SqlDocument.GetCharIndexFromPosition(pt);
-            int Last_Line = SqlDocument.GetLineFromCharIndex(Last_Index);
-            // set Center alignment to LineNumberTextBox    
-            LineNumberTextBox.SelectionAlignment = HorizontalAlignment.Center;
-            // set LineNumberTextBox text to null & width to getWidth() function value    
-            LineNumberTextBox.Text = "";
-            if (Last_Line > 100)
-                LineNumberTextBox.Width = 24;
-            else if (Last_Line > 10)
-                LineNumberTextBox.Width = 16;
-            else
-                LineNumberTextBox.Width = 10;
-
-            // now add each line number to LineNumberTextBox upto last line 
-
-            this.splitContainer2.SplitterDistance = LineNumberTextBox.Width;
-            this.splitContainer2.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
-            for (int i = First_Line; i <= Last_Line + 2; i++)
-            {
-                LineNumberTextBox.Text += i + 1 + "\n";
-            }
-        }
-
-        private void LineNumberTextBox_MouseDown(object sender, MouseEventArgs e)
-        {
-            SqlDocument.Select();
-            LineNumberTextBox.DeselectAll();
-        }
-
-        private void SqlDocument_VScroll(object sender, EventArgs e)
-        {
-            LineNumberTextBox.Text = "";
-            AddLineNumbers();
-            LineNumberTextBox.Invalidate();
-        }
-
+         
         private void in2SqlWF05SqlEngine_Load(object sender, EventArgs e)
         {
-            LineNumberTextBox.Font = SqlDocument.Font;
+            
             SqlDocument.Select();
-            AddLineNumbers();
+           
         }
 
 
@@ -267,83 +212,17 @@ namespace SqlEngine
         private void SqlDocument_TextChanged(object sender, EventArgs e)
         {
 
-            Point pt = SqlDocument.GetPositionFromCharIndex(SqlDocument.SelectionStart);
-            if (pt.X == 1)
-            {
-                AddLineNumbers();
-            }
-
-            // getting keywords/functions
-            string keywords = in2SqlLibrary.getMsSqlReserved();
-            //  string keywords = @"\b(select|from|join|left|right|with|as|union|all|having|group|by)\b";
-            MatchCollection keywordMatches = Regex.Matches(SqlDocument.Text.ToUpper(), keywords);
-
-            // getting types/classes from the text 
-            string types = @"\b(Console)\b";
-            MatchCollection typeMatches = Regex.Matches(SqlDocument.Text, types);
-
-            // getting comments (inline or multiline)
-            string comments = @"(\/\/.+?$|\/\*.+?\*\/)";
-            MatchCollection commentMatches = Regex.Matches(SqlDocument.Text, comments, RegexOptions.Multiline);
-
-            // getting strings
-            string strings = "\".+?\"";
-            MatchCollection stringMatches = Regex.Matches(SqlDocument.Text, strings);
-
-            // saving the original caret position + forecolor
-            int originalIndex = SqlDocument.SelectionStart;
-            int originalLength = SqlDocument.SelectionLength;
-            Color originalColor = Color.Black;
-
-            // MANDATORY - focuses a label before highlighting (avoids blinking)
-            this.Focus();
-
-            // removes any previous highlighting (so modified words won't remain highlighted)
-            SqlDocument.SelectionStart = 0;
-            SqlDocument.SelectionLength = SqlDocument.Text.Length;
-            SqlDocument.SelectionColor = originalColor;
-
-            // scanning...
-            foreach (Match m in keywordMatches)
-            {
-                SqlDocument.SelectionStart = m.Index;
-                SqlDocument.SelectionLength = m.Length;
-                SqlDocument.SelectionColor = Color.Blue;
-            }
-
-            foreach (Match m in typeMatches)
-            {
-                SqlDocument.SelectionStart = m.Index;
-                SqlDocument.SelectionLength = m.Length;
-                SqlDocument.SelectionColor = Color.DarkCyan;
-            }
-
-            foreach (Match m in commentMatches)
-            {
-                SqlDocument.SelectionStart = m.Index;
-                SqlDocument.SelectionLength = m.Length;
-                SqlDocument.SelectionColor = Color.Green;
-            }
-
-            foreach (Match m in stringMatches)
-            {
-                SqlDocument.SelectionStart = m.Index;
-                SqlDocument.SelectionLength = m.Length;
-                SqlDocument.SelectionColor = Color.Brown;
-            }
-
-            // restoring the original colors, for further writing
-            SqlDocument.SelectionStart = originalIndex;
-            SqlDocument.SelectionLength = originalLength;
-            SqlDocument.SelectionColor = originalColor;
-
-            // giving back the focus
-            SqlDocument.Focus();
+            
         }
 
         private void SqlConnectionsToolStripDropDown_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void SqlDocument_Load(object sender, EventArgs e)
+        {
+            SqlDocument.Text = " Free Sql  Manager \n\r  https://t.me/in2sql  \n\r https://sourceforge.net/projects/in2sql/ \n\r er@essbase.ru ";
         }
     }
 }

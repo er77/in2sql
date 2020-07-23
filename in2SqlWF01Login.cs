@@ -22,6 +22,7 @@ namespace SqlEngine
             InitializeComponent();
             this.StartPosition = FormStartPosition.Manual;
             this.Location = new Point(pX, pY);
+            WF01BTOk.Enabled = false;
         }
 
         private void in2SqlWF01Login_Load(object sender, EventArgs e)

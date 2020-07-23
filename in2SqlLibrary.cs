@@ -21,6 +21,8 @@ namespace SqlEngine
             else if (vDriver.ToUpper().Contains("MYODBC")) vDBType = "MYSQL";
             else if (vDriver.ToUpper().Contains("IBM")) vDBType = "DB2";
             else if (vDriver.ToUpper().Contains("DB2")) vDBType = "DB2";
+            else if (vDriver.ToUpper().Contains("CLICKHOUSE")) vDBType = "CH";
+            
             return vDBType;
         }
          
@@ -34,6 +36,7 @@ namespace SqlEngine
             else if (vTypeDB.Contains("PGSQL")) vResult = getPgSqlViews();
             else if (vTypeDB.Contains("MYSQL")) vResult = getMySqlViews();
             else if (vTypeDB.Contains("DB2")) vResult = getDb2Views();
+            else if (vTypeDB.Contains("CH")) vResult = getCHViews();
             return vResult;
         } 
 
@@ -46,6 +49,7 @@ namespace SqlEngine
             else if (vTypeDB.Contains("PGSQL")) vResult = getPgSqlTables();
             else if (vTypeDB.Contains("MYSQL")) vResult = getMySqlTables();
             else if (vTypeDB.Contains("DB2")) vResult = getDb2Tables();
+            else if (vTypeDB.Contains("CH")) vResult = getCHTables();
             return vResult;
         }
 
@@ -58,6 +62,7 @@ namespace SqlEngine
             else if (vTypeDB.Contains("PGSQL")) vResult = getPgSqlProcedurees();
             else if (vTypeDB.Contains("MYSQL")) vResult = getMySqlProcedurees();
             else if (vTypeDB.Contains("DB2")) vResult = getDb2Procedurees();
+            else if (vTypeDB.Contains("CH")) vResult = getMsSqlDummy();
             return vResult;
         }
 
@@ -70,6 +75,7 @@ namespace SqlEngine
             else if (vTypeDB.Contains("PGSQL")) vResult = getPgSqlFuctions();
             else if (vTypeDB.Contains("MYSQL")) vResult = getMySqlFuctions();
             else if (vTypeDB.Contains("DB2")) vResult = getDb2Fuctions();
+            else if (vTypeDB.Contains("CH")) vResult = getMsSqlDummy();
             return vResult;
         }
 
@@ -82,6 +88,7 @@ namespace SqlEngine
             else if (vTypeDB.Contains("PGSQL")) vResult = getPgSqlColumns();
             else if (vTypeDB.Contains("MYSQL")) vResult = getMySqlColumns();
             else if (vTypeDB.Contains("DB2")) vResult = getDb2Columns();
+            else if (vTypeDB.Contains("CH")) vResult = getCHTablesColumns();
             return vResult;
         }
 
@@ -94,8 +101,84 @@ namespace SqlEngine
             else if (vTypeDB.Contains("PGSQL")) vResult = getPgSqlIndexes();
             else if (vTypeDB.Contains("MYSQL")) vResult = getMySqlIndexes();
             else if (vTypeDB.Contains("DB2")) vResult = getDb2Indexes();
+            else if (vTypeDB.Contains("CH")) vResult = getMsSqlDummy();
             return vResult;
         }
+
+        public static string getSQLDependencies(string vTypeDB)
+        {
+            string vResult = "";
+            if (vTypeDB.Contains("MSSQL")) vResult = getMsSqlDummy();
+            else if (vTypeDB.Contains("VERTICA")) vResult = getVerticaDummy();
+            else if (vTypeDB.Contains("ORACLE")) vResult = getOracleDependenies();
+            else if (vTypeDB.Contains("PGSQL")) vResult = getVerticaDummy();
+            else if (vTypeDB.Contains("MYSQL")) vResult = getVerticaDummy();
+            else if (vTypeDB.Contains("DB2")) vResult = getVerticaDummy();
+            else if (vTypeDB.Contains("CH")) vResult = getMsSqlDummy();
+            return vResult;
+        }
+
+ 
+        public static string  getCloudSqlCheck (string vTypeCloudB)
+        { 
+            string vResult = "";
+            if (vTypeCloudB.Contains("CloudCH")) vResult = "select * from system.databases";             
+            return vResult;
+        }
+
+        public static string getCloudSqlView(string vTypeCloudB)
+        {
+            string vResult = "";
+            if (vTypeCloudB.Contains("CloudCH")) vResult = getCHViews();
+            return vResult;
+        }
+
+        public static string getCHViews()
+        {
+            return @"SELECT distinct database ||'.'|| name value FROM system.tables where engine = 'View' ";
+        }
+
+
+        public static string getCloudSqlTable(string vTypeCloudB)
+        {
+            string vResult = "";
+            if (vTypeCloudB.Contains("CloudCH")) vResult = getCHTables();
+            return vResult;
+        }
+
+        public static string getCloudColumns(string vTypeCloudB)
+        {
+            string vResult = "";
+            if (vTypeCloudB.Contains("CloudCH")) vResult = getCHTablesColumns();
+            return vResult;
+        }
+
+
+        public static string getCHTables()
+        {
+            return @"SELECT distinct database ||'.'|| name value FROM system.tables where engine <> 'View' ";
+        }
+
+        public static string getCHTablesColumns ()
+        {
+            return @"SELECT name value  FROM system.columns where  database in ('%TOWNER%') and table  = '%TNAME%'";
+        }
+
+        public static string getOracleDependenies()
+        {
+            return @" select 
+                        o1.owner ||'.' || o1.object_name value 
+                      from public_dependency d 
+                        left join all_objects o1 on 1=1 
+                          and d.object_id = o1.object_id 
+                        left join  all_objects o2 on 1=1 
+                          and d.referenced_object_id = o2.object_id
+                      where 1=1 
+                         and o2.owner in ('%TOWNER%')
+                         and o2.object_name in ('%TNAME%')
+                       ";
+        }
+
 
         public static string getErrConType(string vErroMsg)
         {
@@ -107,6 +190,11 @@ namespace SqlEngine
         public static string getVerticaDummy ()
         {
             return @" select ''  as  value from dual ";
+        }
+
+        public static string getMsSqlDummy()
+        {
+            return @" select ''  as  value  ";
         }
 
         public static string getMsSqlViews()

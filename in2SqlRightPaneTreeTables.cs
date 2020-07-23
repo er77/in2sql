@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static SqlEngine.in2sqlSvcCloud;
 
 namespace SqlEngine
 {
@@ -58,16 +59,14 @@ namespace SqlEngine
             {
                 In2SqlSvcTool.ExpHandler(er, "initSQlObjects");
             }
-        }
+        } 
 
-
-
-        public static void setODBCTreeLineSimple(TreeNode nodeToAddTo, string vOdbcName)
+        public static void setODBCTreeLineSimple(TreeNode nodeToAddTo, string vOdbcName, string vOdbcType= "ODBC$")
         {
             TreeNode vNodeDatabase = new TreeNode(vOdbcName, 1, 1);
 
             nodeToAddTo.Nodes.Add(vNodeDatabase);
-            vNodeDatabase.Tag = "ODBC$";
+            vNodeDatabase.Tag = vOdbcType;
             TreeNode vNodeTable = new TreeNode(" ".ToString(), 100, 100); // vNodeTable.Tag = vCurrTable.Name;
             vNodeDatabase.Nodes.Add(vNodeTable);
         }
@@ -151,25 +150,15 @@ namespace SqlEngine
                 In2SqlSvcTool.ExpHandler(er, "setODBCTreeLineComplex");
             }
         }
-
-
-
-
-        private void FileToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-
-        }
-
-
-
+         
 
         public static void getTablesAndViews(TreeNodeMouseClickEventArgs e)
         {
             e.Node.Nodes.Clear();
-            string VCurrOdbcName = e.Node.Text;
-            In2SqlSvcODBC.checkOdbcStatus(VCurrOdbcName);
+            string vCurrOdbcName = e.Node.Text;
+            In2SqlSvcODBC.checkOdbcStatus(vCurrOdbcName);
 
-            var vCurrODBC = In2SqlSvcODBC.vODBCList.Find(item => item.OdbcName == VCurrOdbcName);
+            var vCurrODBC = In2SqlSvcODBC.vODBCList.Find(item => item.OdbcName == vCurrOdbcName);
 
             try
             {
