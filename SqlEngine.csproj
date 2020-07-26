@@ -33,7 +33,7 @@
     <PublishUrl>C:\MyProject\SqlEngine_Setup\Publish\</PublishUrl>
     <InstallUrl />
     <TargetCulture>en</TargetCulture>
-    <ApplicationVersion>1.0.0.13</ApplicationVersion>
+    <ApplicationVersion>1.0.0.14</ApplicationVersion>
     <AutoIncrementApplicationRevision>true</AutoIncrementApplicationRevision>
     <UpdateEnabled>false</UpdateEnabled>
     <UpdateInterval>0</UpdateInterval>
@@ -242,6 +242,7 @@
     <Compile Include="in2SqlWF09CloudConnectionEditor.Designer.cs">
       <DependentUpon>in2SqlWF09CloudConnectionEditor.cs</DependentUpon>
     </Compile>
+    <Compile Include="In2SqlVBAEngineCloud.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
