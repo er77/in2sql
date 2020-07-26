@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -15,10 +16,10 @@ namespace SqlEngine
     {
         string vConnType = "CH";
 
-        public in2SqlWF09CloudConnectionEditor()
+        public in2SqlWF09CloudConnectionEditor(string vEditName="")
         {
             this.Cursor = new Cursor(Cursor.Current.Handle);
-            int pX = Cursor.Position.X - 200;
+            int pX = Cursor.Position.X - 300;
             int pY = Cursor.Position.Y - 50;
 
             InitializeComponent();
@@ -27,6 +28,17 @@ namespace SqlEngine
 
             WF09BTOk.Enabled = false;
             rbClickHouse.Enabled = true;
+            if (vEditName.Length > 2  )              
+                {
+                 RegistryKey vCurrRegKey = Registry.CurrentUser.OpenSubKey(@"Software\in2sql");
+                tbURL.Text = in2SqlRegistry.getLocalRegValue(vCurrRegKey, vEditName + ".Url");
+                tbLogin.Text = in2SqlRegistry.getLocalRegValue(vCurrRegKey, vEditName + ".Login");
+                tbPassword.Text = in2SqlRegistry.getLocalRegValue(vCurrRegKey, vEditName + ".Password");
+                tbSQL.Text = in2SqlLibrary.getCloudSqlCheck(vEditName);
+                string[]  vNM = vEditName.Split('.');
+                if (vNM.Count() > 1)
+                    tbName.Text = vNM[1];
+                }
 
 
         }
@@ -69,6 +81,11 @@ namespace SqlEngine
         private void rbClickHouse_CheckedChanged(object sender, EventArgs e)
         {
             vConnType = "CH";
+        }
+
+        private void tbName_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }

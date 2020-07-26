@@ -82,5 +82,31 @@ namespace SqlEngine
             }
         }
 
+        public static void delLocalValue(string vOdbcName )
+        {
+            RegistryKey vCurrRegKey = Registry.CurrentUser.OpenSubKey(@"Software\in2sql\", true);
+            try
+            {
+                if (vCurrRegKey == null)
+                    return;
+                vOdbcName = vOdbcName.Replace("#", "");
+                vOdbcName = vOdbcName.Replace("$", "");
+
+                if (vOdbcName.Contains("CloudCH"))
+                {
+                    vCurrRegKey.DeleteValue(vOdbcName + ".Login");
+                    vCurrRegKey.DeleteValue(vOdbcName + ".Password");
+                    vCurrRegKey.DeleteValue(vOdbcName + ".Url");
+                }
+
+                vCurrRegKey.Close();
+            }
+            catch (Exception e)
+            {
+                In2SqlSvcTool.ExpHandler(e, "in2SQLRegistry.etLocalValue");
+            }
+        }
+
     }
 }
+

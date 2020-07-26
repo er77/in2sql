@@ -132,6 +132,7 @@
             this.tbName.Size = new System.Drawing.Size(240, 20);
             this.tbName.TabIndex = 15;
             this.tbName.Text = "CHDemo";
+            this.tbName.TextChanged += new System.EventHandler(this.tbName_TextChanged);
             // 
             // tbLogin
             // 

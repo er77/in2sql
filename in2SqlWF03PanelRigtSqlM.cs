@@ -186,6 +186,8 @@ namespace SqlEngine
         {
             try
             {
+                in2sqlSvcCloud.vCloudList = in2sqlSvcCloud.CloudList();
+
                 foreach (var vCurrCloudList in in2sqlSvcCloud.vCloudList)
                 { 
                     if (vCurrCloudList.CloudType.Contains(vCloudType))
@@ -297,9 +299,42 @@ namespace SqlEngine
                 miSelectNode.SelectedImageIndex = 1;
                 miSelectNode.Tag = "ODBC$";
             }
-        } 
+        }
 
+        private void clickHouse_Click(object sender, EventArgs e)
+        {
+            if (sender.ToString().Contains("Edit"))
+            {
+                string vConnName = miSelectNode.Tag + "." + miSelectNode.Text;
+                vConnName = vConnName.Replace("#","");
+                vConnName = vConnName.Replace("$", "");
 
+                in2SqlWF09CloudConnectionEditor frmshowCloudCHE =  new in2SqlWF09CloudConnectionEditor(vConnName);
+                frmshowCloudCHE.Show();  
+            }
+            else if(sender.ToString().Contains("Create"))
+            {
+                in2SqlWF09CloudConnectionEditor frmshowCloudCHC = new in2SqlWF09CloudConnectionEditor();
+                frmshowCloudCHC.Show(); 
+
+            }
+            else if (sender.ToString().Contains("Refresh"))
+            {
+                miSelectNode.Nodes.Clear();
+                GetCloudRecords(miSelectNode, "CloudCH");
+            }
+
+            else if (sender.ToString().Contains("Delete"))
+            {
+                in2SqlRegistry.delLocalValue(miSelectNode.Tag + "." + miSelectNode.Text);
+
+                miSelectNode.Text = "";
+                miSelectNode.Tag = "";
+                miSelectNode.Nodes.Clear();
+                miSelectNode.ImageIndex = 990;  
+            }
+
+        }
 
         private TreeNode fTN = null;
 
@@ -385,6 +420,8 @@ namespace SqlEngine
                                                                          MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
+ 
+
          private void treeODBC_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
         {
             try
@@ -394,8 +431,7 @@ namespace SqlEngine
                 if (e.Node.Tag != null)
                 {
                     if ((e.Button == MouseButtons.Right) & (e.Node.Tag.ToString().Contains("root")))
-                    {
-                       
+                    { 
                         contextMenuRootODBC = createMenu( 
                                         e
                                     , new String[] { "Edit", "Refresh" }
@@ -412,7 +448,27 @@ namespace SqlEngine
                         return;
                     }
 
-                      if ((e.Button == MouseButtons.Left) & (e.Node.Tag.ToString().ToUpper().Contains("CLOUD")) & (e.Node.Tag.ToString().Contains("$")))
+                    if ((e.Button == MouseButtons.Right) & (e.Node.Tag.ToString().ToUpper().Contains("CLICKHOUSE")) )
+                    {
+                        contextMenuCHRoot = createMenu(
+                                        e
+                                    , new String[] { "Create", "Refresh" }
+                                    , clickHouse_Click
+                                    , contextMenuCHRoot);
+                        return;
+                    }
+
+                    if ((e.Button == MouseButtons.Right) & (e.Node.Tag.ToString().ToUpper().Contains("CLOUD")) & (e.Node.Tag.ToString().ToUpper().Contains("CH")))
+                    {
+                        contextMenuEditCH = createMenu(
+                                        e
+                                    , new String[] { "Edit", "Delete" }
+                                    , clickHouse_Click
+                                    , contextMenuEditCH);
+                        return; 
+                    }
+
+                    if ((e.Button == MouseButtons.Left) & (e.Node.Tag.ToString().ToUpper().Contains("CLOUD")) & (e.Node.Tag.ToString().Contains("$")))
                     {
                         in2SqlRightPaneTreeCloud.getCloudTablesAndViews(e);
                        //   sqlBuild.setLblConnectionName(e.Node.Text);
@@ -420,8 +476,7 @@ namespace SqlEngine
                       }
                      
                     if ((e.Button == MouseButtons.Right) & (e.Node.Tag.ToString().Contains("ODBC%")))
-                    {
-                        contextMenuOdbcError = createMenu(
+                    {    contextMenuOdbcError = createMenu(
                                     e
                                     , new String[] { "ReConnect", "Edit", "Login" }
                                     , rootMenu_Click
@@ -447,8 +502,8 @@ namespace SqlEngine
 
                         }
                         else if (e.Button == MouseButtons.Right)
-                        {
-                            this.contextMenuTable = createMenu(
+                        { 
+                                this.contextMenuTable = createMenu(
                                     e
                                     , new String[] { "to Table", "to PivotTable", "to Chart", "to Sql Editor", "get Properties" }
                                     , RegularObjecteMenu_Click
@@ -501,7 +556,5 @@ namespace SqlEngine
                     Clipboard.SetText(treeODBC.SelectedNode.Text);
                 }
         }
-
-
     }
 }

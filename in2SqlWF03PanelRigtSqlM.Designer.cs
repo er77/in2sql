@@ -46,6 +46,8 @@
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.Joiner = new System.Windows.Forms.TabPage();
             this.contextMenuSqlConnections = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.contextMenuEditCH = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.contextMenuCHRoot = new System.Windows.Forms.ContextMenuStrip(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -213,6 +215,16 @@
             this.contextMenuSqlConnections.Name = "contextMenuSqlConnections";
             this.contextMenuSqlConnections.Size = new System.Drawing.Size(61, 4);
             // 
+            // contextMenuEditCH
+            // 
+            this.contextMenuEditCH.Name = "contextMenuEditCH";
+            this.contextMenuEditCH.Size = new System.Drawing.Size(61, 4);
+            // 
+            // contextMenuCHRoot
+            // 
+            this.contextMenuCHRoot.Name = "contextMenuCHRoot";
+            this.contextMenuCHRoot.Size = new System.Drawing.Size(181, 26);
+            // 
             // in2SqlWF03PanelRigtSqlM
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -252,5 +264,7 @@
         private System.Windows.Forms.ToolStrip toolStrip2;
         private System.Windows.Forms.ToolStripButton newToolStripButton;
         private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.ContextMenuStrip contextMenuEditCH;
+        private System.Windows.Forms.ContextMenuStrip contextMenuCHRoot;
     }
 }
