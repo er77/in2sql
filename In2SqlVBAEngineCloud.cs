@@ -80,7 +80,7 @@ namespace SqlEngine
                                           , Source: xlConn 
                                           ,  Destination: vCurrWorkSheet.Cells(vActivCell.Row, vActivCell.Column) );
                        */
-                       // xlQueryTable.Parent.ListObjects.Refresh();
+                        xlQueryTable.Refresh(true);
                         return;
                     }
             }

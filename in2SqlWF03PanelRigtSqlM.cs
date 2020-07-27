@@ -407,7 +407,10 @@ namespace SqlEngine
                 intSqlVBAEngine.createPivotTable(miSelectNode.Parent.Parent.Text, miSelectNode.Text);
 
             else if (sender.ToString().Contains("Table"))
-                intSqlVBAEngine.createExTable(miSelectNode.Parent.Parent.Text, miSelectNode.Text);
+                if (miSelectNode.Parent.Parent.Tag.ToString().Contains("Cloud"))
+                    In2SqlVBAEngineCloud.createExTable(miSelectNode.Parent.Parent.Text, miSelectNode.Text);
+                else
+                     intSqlVBAEngine.createExTable(miSelectNode.Parent.Parent.Text, miSelectNode.Text);
  
             else if (sender.ToString().Contains("Chart"))
                 MessageBox.Show(string.Concat("You have Clicked '", sender.ToString(), "' Menu"), "Menu Items Event",
