@@ -488,7 +488,7 @@ namespace SqlEngine
                     {
                         if (e.Button == MouseButtons.Left | e.Node.Tag.ToString().Contains('$') )
                         {
-                            if ( e.Node.Tag.ToString().Contains("CLD"))
+                            if (e.Node.Tag.ToString().Contains("CLD") | e.Node.Parent.Parent.Tag.ToString().Contains("Cloud"))
                             {
                                 in2SqlRightPaneTreeCloud.getColumnsAndIndexes(e);
                                 return;
