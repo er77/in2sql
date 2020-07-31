@@ -243,9 +243,26 @@ namespace SqlEngine
                         }
                         
                     }
-                }
-            
+                }            
 
         }
+
+        public static string writeHttpToFile(string vHttpUrl)
+        {
+            string vFileName = Path.GetTempFileName();
+            vFileName = vFileName.ToUpper().Replace(".TMP", ".csv");
+            File.Delete(vFileName);
+            using (StreamWriter vCurrFile = new StreamWriter(vFileName))
+            {
+                foreach (var str in HttpGetArray(vHttpUrl))
+                {
+                    vCurrFile.WriteLine(str);
+                }
+                 
+            }           
+            return vFileName;
+        }
+       
+
     }
 }

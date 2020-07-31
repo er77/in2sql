@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using static SqlEngine.in2sqlSvcCloud;
 using Excel = Microsoft.Office.Interop.Excel;
 
@@ -25,7 +27,7 @@ namespace SqlEngine
             if (vCurrSql == null )
                 vCurrSql = "SELECT * FROM " + vTableName;
             vCurrSql = vCurrSql + " FORMAT TabSeparatedWithNames";
-            string vConnURL = "URL;" +  in2sqlSvcCloud.prepareCloudQuery(vCurrCloud.Url, vCurrSql, vCurrCloud.Login, vCurrCloud.Password);
+            string vConnURL = in2sqlSvcCloud.prepareCloudQuery(vCurrCloud.Url, vCurrSql, vCurrCloud.Login, vCurrCloud.Password);
              
 
             if (vActivCell != null & vConnURL.Length > 1 & vTableName.Length > 1)
@@ -33,58 +35,102 @@ namespace SqlEngine
                 if (vActivCell.Value == null)
                     if (vActivCell.ListObject == null)
                     {
-                        /*
-                             var connections = vCurrWorkBook.Connections.Add(
-                                                           Name: "In2Sql|" + vODBC + "|" + vTableName
-                                                         , Description: vSql
-                                                         , ConnectionString: vDSN
-                                                         , CommandText: vSql
-                                                         , lCmdtype: Excel.XlCmdType.xlCmdSql);
-                        Microsoft.Office.Interop.Excel.ListObject table = vCurrWorkSheet.ListObjects.Add(
-                                                 SourceType: Excel.XlListObjectSourceType.xlSrcQuery
-                                               , Source: connections
-                                               , Destination: vCurrWorkSheet.Cells(vActivCell.Row, vActivCell.Column));
-                         */
-                        var xlQueryTable = vCurrWorkSheet.QueryTables.Add (
-                                                         //  Name: "Cloud|" + vCurrCloudName + "|" + vTableName
-                                                         // Description: vCurrCloudName + "|" + vCurrSql
-                                                          Connection: vConnURL
-                                                          , Destination:vActivCell 
-                                                        /* , FieldNames = true
-                                                         , RefreshOnFileOpen = false
-                                                         , BackgroundQuery = false
-                                                         , RefreshStyle = Excel.XlCellInsertionMode.xlOverwriteCells
-                                                         , SavePassword = true
-                                                         , SaveData = true
-                                                         , AdjustColumnWidth = true
-                                                         , RefreshPeriod = 0 
-                                                         , WebTables = "2"
-                                                         , WebPreFormattedTextToColumns = true
-                                                        */
-                                                         );
-                        xlQueryTable.Name= "Cloud|" + vCurrCloudName + "|" + vTableName;
+
+                        string vTempFile = "TEXT;" + In2SqlSvcTool.writeHttpToFile(vConnURL);
+                       
+
+                        var xlQueryTable = vCurrWorkSheet.QueryTables.Add(
+                                                           Connection: vTempFile
+                                                         , Destination: vActivCell
+                                                        );
+
+                        xlQueryTable.Name = vCurrCloudName + "|" + vTableName;
                         xlQueryTable.FieldNames = true;
+                        xlQueryTable.RowNumbers = false;
+                        xlQueryTable.FillAdjacentFormulas = false;
+                        xlQueryTable.PreserveFormatting = true; 
+                        xlQueryTable.Connection = vTempFile;
                         xlQueryTable.RefreshOnFileOpen = false;
-                        xlQueryTable.BackgroundQuery = true;
-                        xlQueryTable.RefreshStyle = Excel.XlCellInsertionMode.xlOverwriteCells;
-                        xlQueryTable.SavePassword = true;
+                        xlQueryTable.RefreshStyle = Excel.XlCellInsertionMode.xlInsertDeleteCells;
+                        xlQueryTable.SavePassword = false;
                         xlQueryTable.SaveData = true;
                         xlQueryTable.AdjustColumnWidth = true;
                         xlQueryTable.RefreshPeriod = 0;
-                       // xlQueryTable.Refresh  = true;
-                        xlQueryTable.WebTables = "2";
-                        xlQueryTable.WebPreFormattedTextToColumns = true;
+                        xlQueryTable.TextFilePromptOnRefresh = false;
+                        xlQueryTable.TextFileStartRow = 1;
+                       // xlQueryTable.TextFileParseType = Excel.xlDelimited;
+                       // xlQueryTable.TextFileTextQualifier = Excel.xlTextQualifierDoubleQuote;
+                        xlQueryTable.TextFileConsecutiveDelimiter = false;
+                        xlQueryTable.TextFileTabDelimiter = true;
+                        xlQueryTable.TextFileSemicolonDelimiter = true;
+                        xlQueryTable.TextFileOtherDelimiter = "|";
+                        xlQueryTable.TextFileCommaDelimiter = false;
+                        xlQueryTable.TextFileSpaceDelimiter = false;
+                        xlQueryTable.SourceDataFile = vCurrCloudName + "|" + vCurrSql;
+                        xlQueryTable.Refresh(true);                         
 
-                       /* Microsoft.Office.Interop.Excel.ListObject xlQueryTable = vCurrWorkSheet.ListObjects.Add(
-                                            SourceType: Excel.XlListObjectSourceType.xlSrcQuery
-                                          , Source: xlConn 
-                                          ,  Destination: vCurrWorkSheet.Cells(vActivCell.Row, vActivCell.Column) );
-                       */
-                        xlQueryTable.Refresh(true);
+                       vTempFile = vTempFile.Replace("TEXT;", "");
+                        File.Delete(vTempFile);
+                        var qtAddress = xlQueryTable.ResultRange.Address;
+
+
+                        xlQueryTable.Delete();
+                        /*  Microsoft.Office.Interop.Excel.ListObject table = vCurrWorkSheet.ListObjects.Add(
+                                           SourceType: Excel.XlSourceType.xlSourceRange
+                                         , Destination: vActivCell //qtAddress
+                                         , LinkSource: false
+                                         , Type.Missing
+                                         , XlListObjectHasHeaders :Excel.XlYesNoGuess.xlYes
+                                         );
+
+     Microsoft.Office.Interop.Excel.ListObject table = vCurrWorkSheet.ListObjects.Add(
+                                           SourceType: Excel.XlSourceType.xlSourceRange
+                                         , Source: vCurrWorkSheet.Range[qtAddress]
+                                         , Destination: vCurrWorkSheet.Cells(vActivCell.Row, vActivCell.Column)
+                                         , LinkSource: false
+                                         , XlListObjectHasHeaders: Excel.XlYesNoGuess.xlYes
+                                       );
+                                          , Type.Missing
+                                         */
+                        /*
+                        Microsoft.Office.Interop.Excel.ListObject table = vCurrWorkSheet.ListObjects.Add(
+                                            Excel.XlSourceType.xlSourceRange
+                                         , vCurrWorkSheet.Cells(vActivCell.Row, vActivCell.Column) //qtAddress
+                                         , Excel.XlYesNoGuess.xlYes
+                                      
+                                       );
+                               table.Name =  vTableName + "|" + vCurrCloudName;
+                               table.Comment = vCurrCloudName + "|" + vCurrSql;
+                               table.TableStyle = "TableStyleLight13";
+                              
+                        */
+                        // MessageBox.Show(vActivCell.QueryTable.SourceDataFile);
+
+
+                        /*
+                         var xlQueryTable = vCurrWorkSheet.QueryTables.Add ( 
+                                                           Connection: vConnURL
+                                                           , Destination:vActivCell 
+
+                                                          );
+                         xlQueryTable.Name= "Cloud|" + vCurrCloudName + "|" + vTableName;
+                         xlQueryTable.FieldNames = true;
+                         xlQueryTable.RefreshOnFileOpen = false;
+                         xlQueryTable.BackgroundQuery = true;
+                         xlQueryTable.RefreshStyle = Excel.XlCellInsertionMode.xlOverwriteCells;
+                         xlQueryTable.SavePassword = true;
+                         xlQueryTable.SaveData = true;
+                         xlQueryTable.AdjustColumnWidth = true;
+                         xlQueryTable.RefreshPeriod = 0; 
+                         xlQueryTable.WebTables = "2";
+                         xlQueryTable.WebPreFormattedTextToColumns = true;
+
+                         xlQueryTable.Refresh(true);
+                         */
                         return;
                     }
             }
-            System.Windows.Forms.MessageBox.Show(" Please select empty area  in Excel data grid");
+            MessageBox.Show(" Please select empty area  in Excel data grid");
         }
     }
 }

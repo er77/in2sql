@@ -408,7 +408,7 @@ namespace SqlEngine
 
             else if (sender.ToString().Contains("Table"))
                 if (miSelectNode.Parent.Parent.Tag.ToString().Contains("Cloud"))
-                    In2SqlVBAEngineCloud.createExTable(miSelectNode.Parent.Parent.Text, miSelectNode.Text);
+                    In2SqlVBAEngineCloud.createExTable(miSelectNode.Parent.Parent.Text, miSelectNode.Text,null);
                 else
                      intSqlVBAEngine.createExTable(miSelectNode.Parent.Parent.Text, miSelectNode.Text);
  
