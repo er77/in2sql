@@ -12,6 +12,26 @@ namespace SqlEngine
 {
     class In2SqlVBAEngineCloud
     {
+        //https://stackoverflow.com/questions/23835828/add-csv-connection-to-excel-with-c-sharp
+        /*
+         * string strFileName = textpath + "\\filename.csv";
+            OleDbConnection conn = new OleDbConnection("Provider=Microsoft.Jet.OleDb.4.0; Data Source = " + System.IO.Path.GetDirectoryName(strFileName) +"; Extended Properties = \"Text;HDR=YES;FMT=Delimited\"");
+            conn.Open();
+            OleDbDataAdapter adapter = new OleDbDataAdapter("SELECT * FROM " + System.IO.Path.GetFileName(strFileName), conn);
+            DataSet ds = new DataSet("Temp");
+            adapter.Fill(ds);
+            DataTable tb = ds.Tables[0];
+
+        --
+
+            ActiveWorkbook.Connections.Add(Name:="MnM3" _
+                             , Description:="eWE" _
+                             , ConnectionString:=Array(Array( _
+                                "ODBC;DBQ=C:\USERS\ADMINISTRATOR\DOWNLOADS;DefaultDir=C:\USERS\ADMINISTRATOR\DOWNLOADS;Driver={Microsoft Access Text Driver (*.txt, *"), Array(".csv)};DriverId=27;Extensions=txt,csv,tab,asc;FIL=text;MaxBufferSize=2048;MaxScanRows=25;PageTimeout=5;SafeTransactions=0;Threa"), Array("ds=3;UID=admin;UserCommitSync=Yes;")) _
+                             , CommandText:=Array("SELECT  * " & Chr(13) & "" & Chr(10) & "FROM r2.csv r2") _
+                             , lCmdtype:=xlCmdSql).Name = "MnM3"
+
+         */
 
         public static void createExTable(string vCurrCloudName, string vTableName, string vCurrSql = null)
         {
@@ -20,9 +40,7 @@ namespace SqlEngine
             var vActivCell = SqlEngine.currExcelApp.ActiveCell;
 
             CloudProperties vCurrCloud = in2sqlSvcCloud.vCloudList.Find(item => item.CloudName == vCurrCloudName);
-            //public string CloudName, CloudType, Url, Login, Password;
-
-            // SqlEngine.currExcelApp.SheetChange += CurrExcelApp_SheetChange;
+ 
 
             if (vCurrSql == null )
                 vCurrSql = "SELECT * FROM " + vTableName;
@@ -57,9 +75,7 @@ namespace SqlEngine
                         xlQueryTable.AdjustColumnWidth = true;
                         xlQueryTable.RefreshPeriod = 0;
                         xlQueryTable.TextFilePromptOnRefresh = false;
-                        xlQueryTable.TextFileStartRow = 1;
-                       // xlQueryTable.TextFileParseType = Excel.xlDelimited;
-                       // xlQueryTable.TextFileTextQualifier = Excel.xlTextQualifierDoubleQuote;
+                        xlQueryTable.TextFileStartRow = 1; 
                         xlQueryTable.TextFileConsecutiveDelimiter = false;
                         xlQueryTable.TextFileTabDelimiter = true;
                         xlQueryTable.TextFileSemicolonDelimiter = true;
@@ -75,58 +91,7 @@ namespace SqlEngine
 
 
                         xlQueryTable.Delete();
-                        /*  Microsoft.Office.Interop.Excel.ListObject table = vCurrWorkSheet.ListObjects.Add(
-                                           SourceType: Excel.XlSourceType.xlSourceRange
-                                         , Destination: vActivCell //qtAddress
-                                         , LinkSource: false
-                                         , Type.Missing
-                                         , XlListObjectHasHeaders :Excel.XlYesNoGuess.xlYes
-                                         );
-
-     Microsoft.Office.Interop.Excel.ListObject table = vCurrWorkSheet.ListObjects.Add(
-                                           SourceType: Excel.XlSourceType.xlSourceRange
-                                         , Source: vCurrWorkSheet.Range[qtAddress]
-                                         , Destination: vCurrWorkSheet.Cells(vActivCell.Row, vActivCell.Column)
-                                         , LinkSource: false
-                                         , XlListObjectHasHeaders: Excel.XlYesNoGuess.xlYes
-                                       );
-                                          , Type.Missing
-                                         */
-                        /*
-                        Microsoft.Office.Interop.Excel.ListObject table = vCurrWorkSheet.ListObjects.Add(
-                                            Excel.XlSourceType.xlSourceRange
-                                         , vCurrWorkSheet.Cells(vActivCell.Row, vActivCell.Column) //qtAddress
-                                         , Excel.XlYesNoGuess.xlYes
-                                      
-                                       );
-                               table.Name =  vTableName + "|" + vCurrCloudName;
-                               table.Comment = vCurrCloudName + "|" + vCurrSql;
-                               table.TableStyle = "TableStyleLight13";
-                              
-                        */
-                        // MessageBox.Show(vActivCell.QueryTable.SourceDataFile);
-
-
-                        /*
-                         var xlQueryTable = vCurrWorkSheet.QueryTables.Add ( 
-                                                           Connection: vConnURL
-                                                           , Destination:vActivCell 
-
-                                                          );
-                         xlQueryTable.Name= "Cloud|" + vCurrCloudName + "|" + vTableName;
-                         xlQueryTable.FieldNames = true;
-                         xlQueryTable.RefreshOnFileOpen = false;
-                         xlQueryTable.BackgroundQuery = true;
-                         xlQueryTable.RefreshStyle = Excel.XlCellInsertionMode.xlOverwriteCells;
-                         xlQueryTable.SavePassword = true;
-                         xlQueryTable.SaveData = true;
-                         xlQueryTable.AdjustColumnWidth = true;
-                         xlQueryTable.RefreshPeriod = 0; 
-                         xlQueryTable.WebTables = "2";
-                         xlQueryTable.WebPreFormattedTextToColumns = true;
-
-                         xlQueryTable.Refresh(true);
-                         */
+  
                         return;
                     }
             }
