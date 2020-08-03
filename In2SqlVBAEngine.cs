@@ -329,7 +329,7 @@ namespace SqlEngine
 
                         var connections = vCurrWorkBook.Connections.Add(
                                                            Name: "In2Sql|" + vODBC + "|" + vTableName
-                                                         , Description: vSql
+                                                         , Description: "ODBC|" + vODBC + "|" + vSql  
                                                          , ConnectionString: vDSN
                                                          , CommandText: vSql
                                                          , lCmdtype: Excel.XlCmdType.xlCmdSql);
