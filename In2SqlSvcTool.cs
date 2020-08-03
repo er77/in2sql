@@ -7,6 +7,7 @@ using System.Windows.Forms;
 using System.Security.Cryptography;
 using System.IO;
 using System.Net;
+using System.Data.Odbc;
 
 namespace SqlEngine
 {
@@ -246,12 +247,23 @@ namespace SqlEngine
                 }            
 
         }
-
-        public static string writeHttpToFile(string vHttpUrl)
+        
+        public static string getTmpFileName()
         {
             string vFileName = Path.GetTempFileName();
             vFileName = vFileName.ToUpper().Replace(".TMP", ".csv");
             File.Delete(vFileName);
+
+            return vFileName;
+
+        }
+
+        public static string writeHttpToFile(string vHttpUrl)
+        {
+            try
+            {
+                string vFileName = getTmpFileName(); 
+
             using (StreamWriter vCurrFile = new StreamWriter(vFileName))
             {
                 foreach (var str in HttpGetArray(vHttpUrl))
@@ -261,8 +273,88 @@ namespace SqlEngine
                  
             }           
             return vFileName;
+            }
+            catch (Exception e)
+            {
+                In2SqlSvcTool.ExpHandler(e, "In2SqlSvcTool.writeHttpToFile", vHttpUrl );
+                return null;
+            }
         }
-       
+
+        public static IEnumerable<String> sqlReadQuery (string vOdbcName, string queryString = "")
+        {
+            var vCurrODBC = In2SqlSvcODBC.vODBCList.Find(item => item.OdbcName == vOdbcName);
+
+            using
+                  (OdbcConnection conn = new System.Data.Odbc.OdbcConnection())
+            {
+                using (OdbcCommand cmnd = new OdbcCommand(queryString, conn))
+                {
+                    try
+                    {
+                        vCurrODBC.DSNStr = "DSN=" + vOdbcName;
+                        if (vCurrODBC.Login != null)
+                        {
+                            vCurrODBC.DSNStr = vCurrODBC.DSNStr + ";Uid=" + vCurrODBC.Login + ";Pwd=" + vCurrODBC.Password + ";";
+                        }
+
+                        conn.ConnectionString = vCurrODBC.DSNStr;
+                        conn.ConnectionTimeout = 5;
+                        conn.Open();
+                    }
+                    catch (Exception e)
+                    {
+                        In2SqlSvcTool.ExpHandler(e, "In2SqlSvcODBC.ReadData", queryString);
+                        conn.Close();
+                        conn.Dispose();
+                        yield break;
+                    }
+                    OdbcDataReader rd = cmnd.ExecuteReader();
+                    while (rd.Read())
+                    {
+                        string  strRow = "";
+                        for (int i = 0; i < rd.FieldCount; i++)
+                        {
+                            strRow = strRow +  '"' + rd.GetString(i) + '"';
+                            if (i < rd.FieldCount - 1)
+                            {
+                                strRow += ",";
+                            }
+                        }
+
+                        yield return strRow;//.Split(',').ToList();  ;
+                    }
+                    conn.Close();
+                    conn.Dispose();
+                }
+            }
+        }
+
+
+        public static string writeSqlToFile(string vOdbcName, string queryString = "")
+        {
+            try
+            {
+
+                string vFileName = getTmpFileName();
+
+            using (StreamWriter vCurrFile = new StreamWriter(vFileName))
+            {
+                foreach (var str in sqlReadQuery(vOdbcName, queryString))
+                {
+                    vCurrFile.WriteLine(str);
+                }
+
+            }
+            return vFileName;
+            }
+            catch (Exception e)
+            {
+                In2SqlSvcTool.ExpHandler(e, "In2SqlSvcTool.writeSqlToFile", vOdbcName+" # "+queryString);
+                return null;
+            }
+
+        } 
 
     }
 }
