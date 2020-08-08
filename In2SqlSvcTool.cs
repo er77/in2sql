@@ -310,9 +310,10 @@ namespace SqlEngine
                         yield break;
                     }
                     OdbcDataReader rd = cmnd.ExecuteReader();
+					string strRow = "";				   
                     while (rd.Read())
                     {
-                        string  strRow = "";
+                           strRow = "";
                         for (int i = 0; i < rd.FieldCount; i++)
                         {
                             strRow = strRow +  '"' + rd.GetString(i) + '"';
@@ -322,8 +323,7 @@ namespace SqlEngine
                             }
                         }
 
-                        yield return strRow;//.Split(',').ToList();  ;
-                    }
+                        yield return strRow; 
                     conn.Close();
                     conn.Dispose();
                 }
