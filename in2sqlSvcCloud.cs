@@ -103,6 +103,13 @@ namespace SqlEngine
             return 1;
         }
 
+        public static string getCloudType(string vCurrCloudName)
+        {
+            CloudProperties vCurrCloud = vCloudList.Find(item => item.CloudName == vCurrCloudName);
+            return vCurrCloud.CloudType;
+        }
+
+
 
         /*    public static IEnumerable<SqlObjects> getViewList(string vOdbcName)
             {
@@ -117,7 +124,7 @@ namespace SqlEngine
                 }
             }
         */
-            public static IEnumerable<CloudObjects> getCloudTableList(string vCurrCloudName)
+        public static IEnumerable<CloudObjects> getCloudTableList(string vCurrCloudName)
             {
             CloudProperties vCurrCloud = vCloudList.Find(item => item.CloudName == vCurrCloudName);
             string vSqlURL;

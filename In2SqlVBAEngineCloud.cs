@@ -13,8 +13,7 @@ namespace SqlEngine
     class In2SqlVBAEngineCloud
     {
 
-
-
+  
         public static string setSqlLimit(string vCloudType, string vCurrSql)
         {
             string vSql = intSqlVBAEngine.RemoveSqlLimit(vCurrSql);
@@ -29,72 +28,112 @@ namespace SqlEngine
         }
 
 
-        public static void createExTable(string vCurrCloudName, string vTableName, string vCurrSql = null)
+        public static void createExTable(string vCurrCloudName, string vTableName, string vCurrSql = null, int isReplace=0, string vOldTableName="")
         {
             var vCurrWorkSheet = SqlEngine.currExcelApp.ActiveSheet;
             var vCurrWorkBook = SqlEngine.currExcelApp.ActiveWorkbook;
-            var vActivCell = SqlEngine.currExcelApp.ActiveCell;             
+           
+
+            if (isReplace == 1)
+            {
+                vCurrWorkSheet.ListObjects(vOldTableName).Range().Select();
+            }
+
+            var vActivCell = SqlEngine.currExcelApp.ActiveCell;
+
+            SqlEngine.currExcelApp.ScreenUpdating = false;
 
             if (vCurrSql == null )
                 vCurrSql = "SELECT * FROM " + vTableName; 
 
-            string vConnURL = in2sqlSvcCloud.prepareCloudQuery(vCurrCloudName, vCurrSql );             
+            string vConnURL = in2sqlSvcCloud.prepareCloudQuery(vCurrCloudName, vCurrSql );   
+            
+            if ( (isReplace ==  0 )  &  ((vActivCell.ListObject !=null) | (vActivCell.Value != null) ) )
+                {
+                    MessageBox.Show(" Please select empty area  in Excel data grid");
+                    return;
+                }
+
+            if (isReplace == 1)
+               if (vActivCell.ListObject != null)
+                {
+                    try
+                    {
+                        if (vOldTableName == "")
+                            vActivCell.ListObject.Delete();
+                        else
+                            vCurrWorkSheet.ListObjects(vOldTableName).Delete();
+                    }
+                    catch
+                    {
+                    } 
+                }
+
 
             if (vActivCell != null & vConnURL.Length > 1 & vTableName.Length > 1)
             {
-                if (vActivCell.Value == null)
-                    if (vActivCell.ListObject == null)
-                    {
-                       
-                         string vTempFile = "TEXT;" + In2SqlSvcTool.writeHttpToFile(vConnURL);
-                            var xlQueryTable = vCurrWorkSheet.QueryTables.Add(
-                                                               Connection: vTempFile
-                                                             , Destination: vActivCell
-                                                            );
+                string vTempFile = "TEXT;" + In2SqlSvcTool.writeHttpToFile(vConnURL);
+                var xlQueryTable = vCurrWorkSheet.QueryTables.Add(
+                                                      Connection: vTempFile
+                                                    , Destination: vActivCell
+                                                );
 
-                            xlQueryTable.Name = vCurrCloudName + "|" + vTableName;
-                            xlQueryTable.FieldNames = true;
-                            xlQueryTable.RowNumbers = false;
-                            xlQueryTable.FillAdjacentFormulas = false;
-                            xlQueryTable.PreserveFormatting = true; 
-                            xlQueryTable.Connection = vTempFile;
-                            xlQueryTable.RefreshOnFileOpen = false;
-                            xlQueryTable.RefreshStyle = Excel.XlCellInsertionMode.xlInsertDeleteCells;
-                            xlQueryTable.SavePassword = false;
-                            xlQueryTable.SaveData = true;
-                            xlQueryTable.AdjustColumnWidth = true;
-                            xlQueryTable.RefreshPeriod = 0;
-                            xlQueryTable.TextFilePromptOnRefresh = false;
-                            xlQueryTable.TextFileStartRow = 1; 
-                            xlQueryTable.TextFileConsecutiveDelimiter = false;
-                            xlQueryTable.TextFileTabDelimiter = true;
-                            xlQueryTable.TextFileCommaDelimiter = true;
-                            xlQueryTable.TextFileSemicolonDelimiter = true;
-                            xlQueryTable.TextFileOtherDelimiter = "|"; 
-                            xlQueryTable.TextFileSpaceDelimiter = false;
-                            xlQueryTable.SourceDataFile = vCurrCloudName + "|" + vCurrSql;
-                            xlQueryTable.Refresh(true);                         
+                xlQueryTable.Name = vCurrCloudName + "|" + vTableName;
+                xlQueryTable.FieldNames = true;
+                xlQueryTable.RowNumbers = false;
+                xlQueryTable.FillAdjacentFormulas = false;
+                xlQueryTable.PreserveFormatting = true;
+                xlQueryTable.Connection = vTempFile;
+                xlQueryTable.RefreshOnFileOpen = false;
+                xlQueryTable.RefreshStyle = Excel.XlCellInsertionMode.xlInsertDeleteCells;
+                xlQueryTable.SavePassword = false;
+                xlQueryTable.SaveData = true;
+                xlQueryTable.AdjustColumnWidth = true;
+                xlQueryTable.RefreshPeriod = 0;
+                xlQueryTable.TextFilePromptOnRefresh = false;
+                xlQueryTable.TextFileStartRow = 1;
+                xlQueryTable.TextFileConsecutiveDelimiter = false;
+                xlQueryTable.TextFileTabDelimiter = true;
+                xlQueryTable.TextFileCommaDelimiter = true;
+                xlQueryTable.TextFileSemicolonDelimiter = true;
+                xlQueryTable.TextFileOtherDelimiter = "|";
+                xlQueryTable.TextFileSpaceDelimiter = false;
+                xlQueryTable.SourceDataFile = vCurrCloudName + "|" + vCurrSql;
+                xlQueryTable.Refresh(true);
 
-                           vTempFile = vTempFile.Replace("TEXT;", "");
-                           In2SqlSvcTool.deleteFile(vTempFile);  
-                            var qtAddress = xlQueryTable.ResultRange.Address;
+                vTempFile = vTempFile.Replace("TEXT;", "");
+                In2SqlSvcTool.deleteFile(vTempFile);
 
-                            xlQueryTable.Delete();
-                        //, Selection, , xlYes
-                        var xlTable  =   vCurrWorkSheet.ListObjects.Add(
-                                  SourceType: Excel.XlListObjectSourceType.xlSrcRange
-                               , Source: vCurrWorkSheet.Range( qtAddress)
-                               , XlListObjectHasHeaders: Excel.XlYesNoGuess.xlYes);
-                        xlTable.Name = vCurrCloudName + "|" + vTableName;
-                        xlTable.Comment = "CLOUD|" +  vCurrCloudName + "|" + vCurrSql;
 
-                        xlTable.TableStyle = "TableStyleLight13";
+                var qtAddress = xlQueryTable.ResultRange.Address;
 
-                        return;
-                       
-                    }
-            }
-            MessageBox.Show(" Please select empty area  in Excel data grid");
+                xlQueryTable.Delete();
+                //, Selection, , xlYes
+                var xlTable = vCurrWorkSheet.ListObjects.Add(
+                            SourceType: Excel.XlListObjectSourceType.xlSrcRange
+                        , Source: vCurrWorkSheet.Range(qtAddress)
+                        , XlListObjectHasHeaders: Excel.XlYesNoGuess.xlYes);
+
+                string vExTName = vOldTableName;
+                  if (vExTName =="" )
+                     vExTName = vCurrCloudName + "|" + vTableName + '|' + DateTime.Now.ToString("YYYYMMDDTHHmmss");
+                try
+                {
+                    vCurrWorkSheet.ListObjects(vExTName).Delete();
+                }
+                catch { }
+
+                xlTable.Name = vExTName;
+                xlTable.Comment = "CLOUD|" + vCurrCloudName + "|" + vCurrSql;
+
+                xlTable.TableStyle = "TableStyleLight13";
+                intSqlVBAEngine.GetSelectedTab();
+
+                SqlEngine.currExcelApp.ScreenUpdating = true;
+                return;
+            }          
+                
+            
         }
     }
 }

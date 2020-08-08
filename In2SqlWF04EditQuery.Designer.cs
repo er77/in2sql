@@ -171,6 +171,7 @@
             this.SqlEditor.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.SqlEditor.DisabledColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))));
             this.SqlEditor.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.SqlEditor.Font = new System.Drawing.Font("Courier New", 9.75F);
             this.SqlEditor.IsReplaceMode = false;
             this.SqlEditor.Location = new System.Drawing.Point(0, 25);
             this.SqlEditor.Name = "SqlEditor";
@@ -194,6 +195,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "In2SqlWF04EditQuery";
             this.Text = "Sql Editor";
+            this.Load += new System.EventHandler(this.In2SqlWF04EditQuery_Load);
             this.SQLEditToolStrip.ResumeLayout(false);
             this.SQLEditToolStrip.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SqlEditor)).EndInit();

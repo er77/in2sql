@@ -358,8 +358,7 @@ namespace SqlEngine
                 return null;
             }
 
-        }
-  
+        }  
 
         public static DataTable ConvertCSVtoDataTable(string strFilePath, char vSplitChar)
         {   DataTable csvData = new DataTable(); 
