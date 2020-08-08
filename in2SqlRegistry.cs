@@ -82,6 +82,28 @@ namespace SqlEngine
             }
         }
 
+  /*      public static void schedulueDeleteFile(string vFileName )
+        {
+            RegistryKey vCurrRegKey = Registry.LocalMachine.OpenSubKey(@"CurrentControlSet\Control\Session Manager", true);
+            try
+            {
+                if (vCurrRegKey == null)
+                    vCurrRegKey = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\in2sql");
+
+                if (vParameter.Contains("Password"))
+                    vValue = Encrypt(vValue);
+
+                vCurrRegKey.SetValue(vOdbcName + '.' + vParameter, vValue);
+
+                vCurrRegKey.Close();
+            }
+            catch (Exception e)
+            {
+                In2SqlSvcTool.ExpHandler(e, "in2SQLRegistry.etLocalValue");
+            }
+        }
+*/
+
         public static void delLocalValue(string vOdbcName )
         {
             RegistryKey vCurrRegKey = Registry.CurrentUser.OpenSubKey(@"Software\in2sql\", true);

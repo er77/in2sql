@@ -57,27 +57,12 @@ namespace SqlEngine
             this.splitContainer1.Panel2.Hide();
             this.splitContainer1.AutoSize = true;
             this.ODBCtabControl.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.treeODBC.Dock = System.Windows.Forms.DockStyle.Fill;
-           // this.splitContainer2.SplitterDistance = 400; // = new Size(300, 300);
-
-            /// grid prop 
-         //   this.SqlDataResult.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-          //  this.SqlDataResult.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.None;
-
-         //   this.SqlDataResult.AllowUserToOrderColumns = true;
-         //   this.SqlDataResult.AllowUserToResizeColumns = true;
-          //  this.SqlDataResult.AutoResizeColumns();
-
+            this.treeODBC.Dock = System.Windows.Forms.DockStyle.Fill;  
             this.treeODBC.NodeMouseClick +=
-                new TreeNodeMouseClickEventHandler(this.treeODBC_NodeMouseClick);
-
-
+                new TreeNodeMouseClickEventHandler(this.treeODBC_NodeMouseClick); 
             this.treeODBC.KeyPress +=
-                new KeyPressEventHandler(this.in2SqlRightPane_KeyPress);
-
-        
-            this.treeODBC.AllowDrop = true;
-            //     this.SqlDocument.AllowDrop = true;
+                new KeyPressEventHandler(this.in2SqlRightPane_KeyPress); 
+            this.treeODBC.AllowDrop = true; 
 
 
  
@@ -238,7 +223,7 @@ namespace SqlEngine
             }
         }
 
-        private void refreshTreeOdbc_all(TreeNodeMouseClickEventArgs e)
+     /*   private void refreshTreeOdbc_all(TreeNodeMouseClickEventArgs e)
         {
             try
             {
@@ -250,7 +235,7 @@ namespace SqlEngine
                 In2SqlSvcTool.ExpHandler(er, "refreshTreeOdbc_all");
             }
         }
-
+        */
         private ContextMenuStrip createMenu(TreeNodeMouseClickEventArgs e, String[] vMenu, EventHandler myFuncName, ContextMenuStrip vCurrMenu)
         {            
             if (e.Node.ContextMenuStrip == null)
@@ -444,10 +429,27 @@ namespace SqlEngine
 
                     }
 
+                    if ((e.Button == MouseButtons.Right) & (e.Node.Tag.ToString().ToUpper().Contains("CLOUD")) & (e.Node.Tag.ToString().ToUpper().Contains("CH")))
+                    {
+                        contextMenuEditCH = createMenu(
+                                        e
+                                    , new String[] { "Edit", "Delete" }
+                                    , clickHouse_Click
+                                    , contextMenuEditCH);
+                        return;
+                    }
+
                     if ((e.Button == MouseButtons.Left) & (e.Node.Tag.ToString().Contains("ODBC$")))
                     {                        
                         in2SqlRightPaneTreeTables.getTablesAndViews(e);
-                        sqlBuild.setLblConnectionName(e.Node.Text);                     
+                        sqlBuild.setLblConnectionName(e.Node.Text,"ODBC");                     
+                        return;
+                    }
+
+                    if ((e.Button == MouseButtons.Left) & (e.Node.Tag.ToString().ToUpper().Contains("CLOUD")) & (e.Node.Tag.ToString().Contains("$")))
+                    {
+                        in2SqlRightPaneTreeCloud.getCloudTablesAndViews(e);
+                        sqlBuild.setLblConnectionName(e.Node.Text, "CLOUD");
                         return;
                     }
 
@@ -461,22 +463,7 @@ namespace SqlEngine
                         return;
                     }
 
-                    if ((e.Button == MouseButtons.Right) & (e.Node.Tag.ToString().ToUpper().Contains("CLOUD")) & (e.Node.Tag.ToString().ToUpper().Contains("CH")))
-                    {
-                        contextMenuEditCH = createMenu(
-                                        e
-                                    , new String[] { "Edit", "Delete" }
-                                    , clickHouse_Click
-                                    , contextMenuEditCH);
-                        return; 
-                    }
 
-                    if ((e.Button == MouseButtons.Left) & (e.Node.Tag.ToString().ToUpper().Contains("CLOUD")) & (e.Node.Tag.ToString().Contains("$")))
-                    {
-                        in2SqlRightPaneTreeCloud.getCloudTablesAndViews(e);
-                       //   sqlBuild.setLblConnectionName(e.Node.Text);
-                          return;
-                      }
                      
                     if ((e.Button == MouseButtons.Right) & (e.Node.Tag.ToString().Contains("ODBC%")))
                     {    contextMenuOdbcError = createMenu(
@@ -508,7 +495,7 @@ namespace SqlEngine
                         { 
                                 this.contextMenuTable = createMenu(
                                     e
-                                    , new String[] { "to Table", "to PivotTable", "to Chart", "to Sql Editor", "get Properties" }
+                                    , new String[] { "to Table", "to PivotTable",  "to Sql Editor", "get Properties" }
                                     , RegularObjecteMenu_Click
                                     , this.contextMenuTable);
                             return;

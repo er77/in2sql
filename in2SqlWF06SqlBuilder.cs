@@ -15,6 +15,8 @@ namespace SqlEngine
     {
         private static List<TreeNode> vTableList = new List<TreeNode>() ;
 
+        private  string vConnType = "ODBC";
+
         public in2SqlWF06SqlBuilder()
         {
             InitializeComponent();
@@ -29,9 +31,10 @@ namespace SqlEngine
 
         }
 
-        public void setLblConnectionName (string lblName )
+        public void setLblConnectionName (string lblName, string vCurrConnType = "ODBC" )
         {
             this.lblConnectionName.Text = lblName;
+            vConnType = vCurrConnType;
         }
 
         public string getLblConnectionName( )

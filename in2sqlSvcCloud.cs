@@ -56,15 +56,35 @@ namespace SqlEngine
             }
         }
 
-        public static string prepareCloudQuery ( string vUrl, string vSql,string vLogin,string vPassword )
+        public static string prepareCloudQuery_int(string Url, string vCurrSql , string vLogin, string vPassword)
         {
-            string vResult = vUrl;
-
-            vResult = vResult.Replace("%SQL%", vSql);
+            string vResult = Url;
+            vResult = vResult.Replace("%SQL%", vCurrSql);
             vResult = vResult.Replace("%LOGIN%", vLogin);
             vResult = vResult.Replace("%PASSWORD%", vPassword);
-
             return vResult;
+        }
+
+        public static string prepareCloudQuery ( string vCloudName, string vCurrSql)
+        {
+
+            if (vCurrSql == null | vCloudName == null | vCurrSql == "" | vCloudName == "")
+                return "";
+
+            CloudProperties vCurrCloud = in2sqlSvcCloud.vCloudList.Find(item => item.CloudName == vCloudName);
+
+            if (vCurrCloud.CloudName == null)
+                return "";
+
+            vCurrSql = In2SqlVBAEngineCloud.setSqlLimit(vCurrCloud.CloudType, vCurrSql);
+
+            if (vCurrCloud.CloudType.Contains("CloudCH"))
+                vCurrSql = vCurrSql.Replace("FORMAT CSVWithNames", "") + " FORMAT CSVWithNames";
+
+            
+            In2SqlSvcTool.addSqlLog(vCloudName, vCurrSql);                       
+
+            return prepareCloudQuery_int(vCurrCloud.Url, vCurrSql, vCurrCloud.Login, vCurrCloud.Password) ;
         }
 
         public static int checkCloudState (string  vCurrCloudName)
@@ -72,9 +92,7 @@ namespace SqlEngine
 
             CloudProperties vCurrCloud = vCloudList.Find(item => item.CloudName == vCurrCloudName);
 
-            string vSqlURL ; 
-
-            vSqlURL = prepareCloudQuery(vCurrCloud.Url, in2SqlLibrary.getCloudSqlCheck(vCurrCloud.CloudType), vCurrCloud.Login, vCurrCloud.Password);
+            string vSqlURL  = prepareCloudQuery(vCurrCloudName, in2SqlLibrary.getCloudSqlCheck(vCurrCloud.CloudType) );
             vSqlURL = In2SqlSvcTool.HttpGet(vSqlURL);
 
             if (vSqlURL.Length < 2)
@@ -104,7 +122,7 @@ namespace SqlEngine
             CloudProperties vCurrCloud = vCloudList.Find(item => item.CloudName == vCurrCloudName);
             string vSqlURL;
 
-            vSqlURL = prepareCloudQuery(vCurrCloud.Url, in2SqlLibrary.getCloudSqlTable(vCurrCloud.CloudType), vCurrCloud.Login, vCurrCloud.Password);
+            vSqlURL = prepareCloudQuery(vCurrCloudName, in2SqlLibrary.getCloudSqlTable(vCurrCloud.CloudType));
 
              return getCloudObjectList(vSqlURL);
                
@@ -115,7 +133,7 @@ namespace SqlEngine
             CloudProperties vCurrCloud = vCloudList.Find(item => item.CloudName == vCurrCloudName);
             string vSqlURL;
 
-            vSqlURL = prepareCloudQuery(vCurrCloud.Url, in2SqlLibrary.getCloudSqlView(vCurrCloud.CloudType), vCurrCloud.Login, vCurrCloud.Password);
+            vSqlURL = prepareCloudQuery(vCurrCloudName, in2SqlLibrary.getCloudSqlView(vCurrCloud.CloudType));
 
             return getCloudObjectList(vSqlURL);
 
@@ -126,11 +144,15 @@ namespace SqlEngine
              
             List<String> vObjects = new List<String>();
             vObjects.AddRange(In2SqlSvcTool.HttpGetArray(vSqlURL));
-
+            int i = 0;
             foreach (var vCurrObj in vObjects)
             {
+                i += 1;
+                if (i < 2)
+                    continue;
+
                 CloudObjects vObj = new CloudObjects();
-                vObj.Name = vCurrObj.ToString();
+                vObj.Name = vCurrObj.ToString().Replace('"',' ').Trim();
                 vObj.idTbl = vIdtbl;
                 vIdtbl = vIdtbl + 1;
                 yield return vObj;
@@ -143,7 +165,7 @@ namespace SqlEngine
             CloudProperties vCurrCloud = vCloudList.Find(item => item.CloudName == vCurrCloudName);
             string vSqlURL;
 
-            vSqlURL = prepareCloudQuery(vCurrCloud.Url, in2SqlLibrary.getCloudColumns(vCurrCloud.CloudType), vCurrCloud.Login, vCurrCloud.Password);
+            vSqlURL = prepareCloudQuery(vCurrCloudName, in2SqlLibrary.getCloudColumns(vCurrCloud.CloudType));
             var vTb1 = vObjName.Split('.');
 
             vSqlURL = vSqlURL.Replace("%TNAME%", vTb1[1]);
@@ -155,10 +177,13 @@ namespace SqlEngine
 
             List<String> vObjects = new List<String>();
             vObjects.AddRange(In2SqlSvcTool.HttpGetArray(vSqlURL));
-
+            int i = 0;
             foreach (var vCurrObj in vObjects)
             {
-                vObject.objColumns.Add(vCurrObj);
+                i += 1;
+                if (i < 2)
+                    continue;
+                vObject.objColumns.Add(vCurrObj.ToString().Replace('"', ' ').Trim());
             }
 
             yield return vObject;

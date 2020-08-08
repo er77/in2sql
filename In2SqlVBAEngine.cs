@@ -223,6 +223,7 @@ namespace SqlEngine
         {
 
             string vSql = RemoveSqlLimit(vCurrSql);
+
             string vTypeODBC = In2SqlSvcODBC.getODBCProperties(vODBC, "DBType");
             if (vTypeODBC.ToUpper().Contains("VERTICA"))
             {

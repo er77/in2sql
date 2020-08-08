@@ -4,11 +4,13 @@ using System.ComponentModel;
 using System.Data;
 using System.Data.Odbc;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static SqlEngine.in2sqlSvcCloud;
 
 namespace SqlEngine
 {
@@ -30,11 +32,20 @@ namespace SqlEngine
 
             foreach (var vCurrvODBCList in In2SqlSvcODBC.vODBCList)
             {
-                ToolStripMenuItem vCurrConnMenu = new ToolStripMenuItem(vCurrvODBCList.OdbcName);
+                ToolStripMenuItem vCurrConnMenu = new ToolStripMenuItem(vCurrvODBCList.OdbcName + " | odbc"  );
                 vCurrConnMenu.Click += Connection_Click;
                 contextMenuSqlConnections.Items.Add(vCurrConnMenu);
             }
             SqlConnectionsToolStripDropDown.DropDown = contextMenuSqlConnections;
+
+            foreach (var vCurrvCloud in in2sqlSvcCloud.vCloudList)
+            {
+                ToolStripMenuItem vCurrConnMenu = new ToolStripMenuItem(vCurrvCloud.CloudName + " | cloud");
+                vCurrConnMenu.Click += Connection_Click;
+                contextMenuSqlConnections.Items.Add(vCurrConnMenu);
+            }
+            SqlConnectionsToolStripDropDown.DropDown = contextMenuSqlConnections;
+
         }
 
         private void Connection_Click(object sender, EventArgs e)
@@ -159,6 +170,66 @@ namespace SqlEngine
         }
         */
 
+        private void  OdbcGrid (string vOdbcName , string vSqlCommand)
+        {
+            try
+            {
+                string DsnConn = In2SqlSvcODBC.getODBCProperties(vOdbcName, "DSNStr"); 
+
+                if (DsnConn == null | DsnConn == "")
+                {
+                    MessageBox.Show("Please make the connection by expand list on the left pane ", "sql run event",
+                                                                            MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+
+                intSqlVBAEngine.setSqlLimit(vOdbcName, vSqlCommand);
+                In2SqlSvcTool.addSqlLog(vOdbcName, vSqlCommand);
+
+                using
+                        (OdbcConnection conn = new System.Data.Odbc.OdbcConnection(DsnConn))
+                        using (OdbcDataAdapter cmnd = new OdbcDataAdapter(vSqlCommand, conn))
+                        {
+                            DataTable table = new DataTable();
+                            cmnd.Fill(table);                     
+                            this.SqlDataResult.DataSource = table;
+                        }
+            }
+            catch (Exception e)
+            {
+                if ((e.HResult == -2147024809) == false)
+                    In2SqlSvcTool.ExpHandler(e, "OdbcGrid");
+            }
+        }
+
+        private void CloudGrid(string vCloudName, string vCurrSql)
+        {
+            try
+            {
+                if (vCurrSql == null | vCloudName == null | vCurrSql == "" | vCloudName == "")
+                    return;              
+                 
+                string vConnURL = in2sqlSvcCloud.prepareCloudQuery(vCloudName, vCurrSql );
+
+                if (vConnURL == null | vConnURL == "")
+                {
+                    MessageBox.Show("Please make the connection by expand list on the left pane ", "sql run event",
+                                                                            MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+
+                string vTempFile = In2SqlSvcTool.writeHttpToFile(vConnURL);
+
+                this.SqlDataResult.DataSource = In2SqlSvcTool.ConvertCSVtoDataTable(vTempFile,',');
+                 In2SqlSvcTool.deleteFile(vTempFile);
+                
+            }
+            catch (Exception e)
+            { 
+                    In2SqlSvcTool.ExpHandler(e, "CloudGrid");
+            }
+        }
+
         private  void  sqlExecuteandDataGrid(string  SqlCommand)
         {
            // await Task.Delay(1);
@@ -171,32 +242,17 @@ namespace SqlEngine
             }
 
             try
-            { 
-                string DsnConn = In2SqlSvcODBC.getODBCProperties(ConnName.Text, "DSNStr");
-                if (DsnConn == null | DsnConn == "")
-                {
-                    MessageBox.Show("Please make the connection by expand list on the left pane ", "sql run event",
-                                                                            MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    return;
-                }
-                 
-                intSqlVBAEngine.setSqlLimit(ConnName.Text, SqlCommand);
+            {
+                
+                string[] vTempName = ConnName.Text.Split('|');
+                string vOdbcName = vTempName[0].Trim();
+                if (vTempName.Count() > 1)
+                    if (vTempName[1].ToUpper().Contains("ODBC"))
+                        OdbcGrid(vOdbcName, SqlCommand);
+                    else if (vTempName[1].ToUpper().Contains("CLOUD"))
+                        CloudGrid(vOdbcName, SqlCommand);
 
-                In2SqlSvcTool.addSqlLog(ConnName.Text, SqlCommand);
-
-                using
-                        (OdbcConnection conn = new System.Data.Odbc.OdbcConnection(DsnConn))
-                using (OdbcDataAdapter cmnd = new OdbcDataAdapter(SqlCommand, conn))
-                {
-                    DataTable table = new DataTable();
-                    cmnd.Fill(table);
-
-                    /*  Action action1 = () => this.SqlDataResult.DataSource = table;
-                      SqlDataResult.Invoke(action1);
-                      */
-                    this.SqlDataResult.DataSource = table; 
-
-                }
+ 
                 
             }
             catch (Exception e)
