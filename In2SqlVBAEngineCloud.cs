@@ -44,7 +44,7 @@ namespace SqlEngine
             SqlEngine.currExcelApp.ScreenUpdating = false;
 
             if (vCurrSql == null )
-                vCurrSql = "SELECT * FROM " + vTableName; 
+                vCurrSql = "SELECT \n\t * \n FROM \n\t " + vTableName + "\n where 1=1   "; 
 
             string vConnURL = in2sqlSvcCloud.prepareCloudQuery(vCurrCloudName, vCurrSql );   
             

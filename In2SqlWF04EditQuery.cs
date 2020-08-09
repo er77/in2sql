@@ -14,60 +14,25 @@ namespace SqlEngine
     public partial class In2SqlWF04EditQuery : Form
     {
         private Microsoft.Office.Interop.Excel.ListObject vCurrTable;
+         
 
-        private string vTypeConnection = "";
-        private string vTableName = "";
-        private string vCurrCloudName = "";
-        private string vCurrCloudExTName = "";
+        private In2SqlSvcTool.CurrentTableRecords vCTR = In2SqlSvcTool.getCurrentSql();
 
         public In2SqlWF04EditQuery()
         {
+            vCTR = In2SqlSvcTool.getCurrentSql();
 
-            if (vCurrCloudExTName !="")
+            if (vCTR.CurrCloudExTName != "")
              {
-                SqlEngine.currExcelApp.ActiveSheet.ListObjects(vCurrCloudExTName).Range().Select();
+                SqlEngine.currExcelApp.ActiveSheet.ListObjects(vCTR.CurrCloudExTName).Range().Select();
              }
-
-            vCurrTable = SqlEngine.currExcelApp.ActiveCell.ListObject;
-             
-            if ((vCurrTable == null )  )
-            {
-                MessageBox.Show("Please select table with SQL query");                 
-                return;
-            }
-            string vSql = "";
-            if (vCurrTable.Comment.Contains("CLOUD"))
-            {
-                vTypeConnection = "CLOUD";
-                string[] vTemp1 = vCurrTable.Comment.Split('|');
-                if (vTemp1.Count() < 2)
-                    return;
-                vSql = vTemp1[2];
-                vCurrCloudName = vTemp1[1];
-
-                string[] vTemp2= vCurrTable.Name.Split('|');
-                vCurrCloudExTName = vCurrTable.Name;
-                vTableName = vTemp2[1];
-
-            }
-            else {
-                vTypeConnection = "ODBC";
-                vSql = vCurrTable.QueryTable.CommandText;
-               
-            }
 
             InitializeComponent();
             SqlEditor.Language = FastColoredTextBoxNS.Language.SQL;
 
-            vSql = intSqlVBAEngine.RemoveBetween(vSql, '`', '`');
-            vSql = vSql.Replace("/**/", "");
-
-            SqlEditor.Text = vSql;
-             this.Text = "Sql Edit: " + vCurrTable.Name;
-          //  this.TableName.Text =  vCurrObject.Name;
-            SqlEditor_TextChanged( null, null);
-
-            
+            SqlEditor.Text = vCTR.Sql;
+             this.Text = "Sql Edit: " + vCTR.TableName; 
+            SqlEditor_TextChanged( null, null);            
         }
 
       
@@ -110,19 +75,19 @@ namespace SqlEngine
                 SqlEditor.ReadOnly = true;
                 SQLEditToolStrip.Focus();
 
-                if (vTypeConnection.Contains("ODBC"))
+                if (vCTR.TypeConnection.Contains("ODBC"))
                 {   vCurrTable.QueryTable.CommandText = intSqlVBAEngine.setSqlLimit(intSqlVBAEngine.getOdbcNameFromObject(vCurrTable), SqlEditor.Text);
                     intSqlVBAEngine.objRefreshHistory(vCurrTable);                    
                 }
 
-                if (vTypeConnection.Contains("CLOUD"))
+                if (vCTR.TypeConnection.Contains("CLOUD"))
                 {
-                    In2SqlVBAEngineCloud.createExTable(  
-                                                         vCurrCloudName
-                                                       , vTableName
-                                                       , In2SqlVBAEngineCloud.setSqlLimit(in2sqlSvcCloud.getCloudType(vCurrCloudName), SqlEditor.Text)
+                    In2SqlVBAEngineCloud.createExTable(
+                                                         vCTR.CurrCloudName
+                                                       , vCTR.TableName
+                                                       , SqlEditor.Text
                                                        , 1
-                                                       , vCurrCloudExTName) ;
+                                                       , vCTR.CurrCloudExTName) ;
                 }
                  
                 SqlEditor.ReadOnly = false;

@@ -403,5 +403,49 @@ namespace SqlEngine
                 vTempFile = "";
             }
         }
+
+       public struct CurrentTableRecords 
+        {  
+            public string  TypeConnection, TableName , CurrCloudName, CurrCloudExTName, Sql;
+        } 
+
+        public static CurrentTableRecords getCurrentSql ()
+        {           
+            var vCurrTable = SqlEngine.currExcelApp.ActiveCell.ListObject;
+            CurrentTableRecords vCTR = new CurrentTableRecords();
+            vCTR.Sql = "";
+            vCTR.TypeConnection = "";
+            vCTR.TableName = "";
+            vCTR.CurrCloudName = "";
+            vCTR.CurrCloudExTName = "";
+
+            if (vCurrTable == null)
+                return vCTR;
+
+            if (vCurrTable.Comment.Contains("CLOUD"))
+            {               
+                string[] vTemp1 = vCurrTable.Comment.Split('|');
+                if (vTemp1.Count() < 2)
+                    return vCTR;
+                vCTR.TypeConnection = "CLOUD";
+                vCTR.Sql = vTemp1[2];
+                vCTR.CurrCloudName = vTemp1[1];
+
+                string[] vTemp2 = vCurrTable.Name.Split('|');
+                vCTR.CurrCloudExTName = vCurrTable.Name;
+                vCTR.TableName = vTemp2[1];
+            }
+            else
+            {
+                vCTR.TypeConnection = "ODBC";
+                vCTR.Sql = vCurrTable.QueryTable.CommandText;
+            }
+
+            vCTR.Sql = intSqlVBAEngine.RemoveBetween(vCTR.Sql, '`', '`');
+            vCTR.Sql = vCTR.Sql.Replace("/**/", "");
+
+            return vCTR;
+        }
+
     }
 }

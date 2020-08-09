@@ -505,16 +505,30 @@ namespace SqlEngine
             var vCurrWorkSheet = SqlEngine.currExcelApp.ActiveSheet;
             var vActivCell = SqlEngine.currExcelApp.ActiveCell;
 
+            In2SqlSvcTool.CurrentTableRecords vCTR = In2SqlSvcTool.getCurrentSql();
+
             if (vActivCell != null)
-            {
-                string vSql = vActivCell.ListObject.QueryTable.CommandText;
+            { 
 
-                vSql = vSql + Environment.NewLine
-                                + " and " + vCurrWorkSheet.Cells(vActivCell.ListObject.Range.Row, vActivCell.Column).Value
-                               + " <> '" + vActivCell.Value + "'";
+                vCTR.Sql = vCTR.Sql + Environment.NewLine
+                                + " \t and " + vCurrWorkSheet.Cells(vActivCell.ListObject.Range.Row, vActivCell.Column).Value
+                                + " <> '" + vActivCell.Value + "'";
 
-                vActivCell.ListObject.QueryTable.CommandText =   vSql ;                
-                objRefreshHistory(vActivCell.ListObject); 
+                if (vCTR.TypeConnection.Contains("ODBC"))
+                {
+                    vActivCell.ListObject.QueryTable.CommandText = vCTR.Sql;
+                    objRefreshHistory(vActivCell.ListObject);
+                }
+
+                if (vCTR.TypeConnection.Contains("CLOUD"))
+                {
+                    In2SqlVBAEngineCloud.createExTable(
+                                                         vCTR.CurrCloudName
+                                                       , vCTR.TableName
+                                                       , vCTR.Sql
+                                                       , 1
+                                                       , vCTR.CurrCloudExTName);
+                }
 
                 return;
             }
