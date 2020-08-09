@@ -336,10 +336,10 @@ namespace SqlEngine
                         break;
 
                     case "About":
-                        //showAbout();
-                       var frmshowAbout = new in2SqlWF09CloudConnectionEditor();
+                        showAbout();
+                     /*  var frmshowAbout = new in2SqlWF09CloudConnectionEditor();
                         frmshowAbout.Show();
-                        ActivateTab();
+                        ActivateTab();*/
                         break;
 
 

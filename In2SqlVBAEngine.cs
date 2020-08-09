@@ -400,6 +400,14 @@ namespace SqlEngine
 
         public static void updateTables(string vDNS = "")
         {
+            In2SqlSvcTool.CurrentTableRecords vCTR = In2SqlSvcTool.getCurrentSql();
+
+            if (vCTR.TypeConnection.Contains("CLOUD"))
+            {
+                System.Windows.Forms.MessageBox.Show("Update cloud is not support");
+            }
+
+
             if (vDNS == "")
                 vDNS = getOdbcNameFromCell();
 
@@ -490,21 +498,7 @@ namespace SqlEngine
                                 + " \t and " + vCurrWorkSheet.Cells(vActivCell.ListObject.Range.Row, vActivCell.Column).Value
                                 + "= '" + vActivCell.Value + "'";
 
-                if (vCTR.TypeConnection.Contains("ODBC"))
-                {
-                    vActivCell.ListObject.QueryTable.CommandText = vCTR.Sql;
-                    objRefreshHistory(vActivCell.ListObject);
-                }
-
-                if (vCTR.TypeConnection.Contains("CLOUD"))
-                {
-                    In2SqlVBAEngineCloud.createExTable(
-                                                         vCTR.CurrCloudName
-                                                       , vCTR.TableName
-                                                       , vCTR.Sql
-                                                       , 1
-                                                       , vCTR.CurrCloudExTName);
-                }
+                tableRefresh(vCTR);
 
                 //  SqlEngine.currExcelApp.SendKeys("%YQA%");
                 return;
@@ -527,21 +521,7 @@ namespace SqlEngine
                                 + " \t and " + vCurrWorkSheet.Cells(vActivCell.ListObject.Range.Row, vActivCell.Column).Value
                                 + " <> '" + vActivCell.Value + "'";
 
-                if (vCTR.TypeConnection.Contains("ODBC"))
-                {
-                    vActivCell.ListObject.QueryTable.CommandText = vCTR.Sql;
-                    objRefreshHistory(vActivCell.ListObject);
-                }
-
-                if (vCTR.TypeConnection.Contains("CLOUD"))
-                {
-                    In2SqlVBAEngineCloud.createExTable(
-                                                         vCTR.CurrCloudName
-                                                       , vCTR.TableName
-                                                       , vCTR.Sql
-                                                       , 1
-                                                       , vCTR.CurrCloudExTName);
-                }
+                tableRefresh(vCTR);
 
                 return;
             }
@@ -593,6 +573,31 @@ namespace SqlEngine
             vCurrObject.TableStyle = "TableStyleLight13";
         }
 
+        public static void tableRefresh(In2SqlSvcTool.CurrentTableRecords vCTR, int vIsUndoList = 1)
+        {
+            var vActivCell = SqlEngine.currExcelApp.ActiveCell;
+
+            if (vCTR.TypeConnection.Contains("ODBC"))
+            {
+                vActivCell.ListObject.QueryTable.CommandText = vCTR.Sql;
+                objRefreshHistory(vActivCell.ListObject, vIsUndoList);
+            }
+
+            if (vCTR.TypeConnection.Contains("CLOUD"))
+            {
+                In2SqlVBAEngineCloud.createExTable(
+                                                     vCTR.CurrCloudName
+                                                   , vCTR.TableName
+                                                   , vCTR.Sql
+                                                   , 1
+                                                   , vCTR.CurrCloudExTName);
+
+                In2SqlSvcTool.addSqlLog(vCTR.Sql);
+                if (vIsUndoList ==1 )
+                    In2SqlSvcUndoManagment.addToUndoList(vActivCell.ListObject.Name, vCTR.Sql);
+
+            }
+        }
 
         public static void Undo()
         {
@@ -604,13 +609,17 @@ namespace SqlEngine
                     MessageBox.Show(" Please,  select cell from the table", " Refresh error");
                     return;
                 }
- 
-                    string vSql = In2SqlSvcUndoManagment.getLastSqlActionUndo(vActivCell.ListObject.Name);
+
+                In2SqlSvcTool.CurrentTableRecords vCTR = In2SqlSvcTool.getCurrentSql();
+
+                string vSql = In2SqlSvcUndoManagment.getLastSqlActionUndo(vActivCell.ListObject.Name);
                     if ((vSql == null) == false)
                     {
-                        vActivCell.ListObject.QueryTable.CommandText = vSql;                                             
-                        objRefreshHistory(vActivCell.ListObject,0);                      
-                    }
+                    vCTR.Sql = vSql;
+
+                    tableRefresh(vCTR,0);
+
+                }
 
                     GetSelectedTab();
                   
@@ -627,17 +636,18 @@ namespace SqlEngine
         public static void Redo()
         {
             try
-            {
-               
+            {               
                 var vActivCell = SqlEngine.currExcelApp.ActiveCell;
                 if ((vActivCell.ListObject == null) == false)
                 {
+                    In2SqlSvcTool.CurrentTableRecords vCTR = In2SqlSvcTool.getCurrentSql();
+
                     string vSql = In2SqlSvcUndoManagment.getLastSqlActionRedo(vActivCell.ListObject.Name);
                     if ((vSql == null) == false)
                     {
-                        vActivCell.ListObject.QueryTable.CommandText = vSql;
-                        objRefreshHistory(vActivCell.ListObject, 0);
+                        vCTR.Sql = vSql;
 
+                        tableRefresh(vCTR,0);
                     }
                     GetSelectedTab();
                     
@@ -688,8 +698,21 @@ namespace SqlEngine
                 MessageBox.Show(" Please, select cell from the table", " Refresh error");
                 return;
             }
-            string vSql = RemoveSqlLimit(vActivCell.ListObject.QueryTable.CommandText);
-            createPivotTable(getOdbcNameFromCell(), In2SqlSvcTool.GetHash(vSql), vSql);
+
+            In2SqlSvcTool.CurrentTableRecords vCTR = In2SqlSvcTool.getCurrentSql();
+
+            if (vCTR.TypeConnection.Contains("ODBC"))
+            {
+                string vSql = RemoveSqlLimit(vActivCell.ListObject.QueryTable.CommandText);
+                createPivotTable(getOdbcNameFromCell(), In2SqlSvcTool.GetHash(vSql), vSql);
+            }
+
+            if (vCTR.TypeConnection.Contains("CLOUD"))
+            {
+                SqlEngine.currExcelApp.SendKeys("%NVT");
+            }
+
+        
 
             GetSelectedTab();
 
@@ -736,7 +759,7 @@ namespace SqlEngine
         public static void GetSelectedTab ()
         {
             SqlEngine.currExcelApp.ScreenUpdating = false;
-             SqlEngine.currExcelApp.SendKeys("%YQA");
+             SqlEngine.currExcelApp.SendKeys("%Y%Q%A");
              SqlEngine.currExcelApp.SendKeys("%");
              SqlEngine.currExcelApp.CommandBars.ReleaseFocus();//CommandBars.ReleaseFocus 
              
