@@ -48,6 +48,7 @@
             this.contextMenuSqlConnections = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.contextMenuEditCH = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.contextMenuCHRoot = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.contextMenuCSV = new System.Windows.Forms.ContextMenuStrip(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -82,6 +83,9 @@
             this.ODBCImages.Images.SetKeyName(17, "17_excel_table.png");
             this.ODBCImages.Images.SetKeyName(18, "22_cloud.png");
             this.ODBCImages.Images.SetKeyName(19, "23_CH.png");
+            this.ODBCImages.Images.SetKeyName(20, "24_csv.png");
+            this.ODBCImages.Images.SetKeyName(21, "25_csv.png");
+            this.ODBCImages.Images.SetKeyName(22, "26_csv_file.png");
             // 
             // contextMenuTable
             // 
@@ -223,7 +227,12 @@
             // contextMenuCHRoot
             // 
             this.contextMenuCHRoot.Name = "contextMenuCHRoot";
-            this.contextMenuCHRoot.Size = new System.Drawing.Size(181, 26);
+            this.contextMenuCHRoot.Size = new System.Drawing.Size(61, 4);
+            // 
+            // contextMenuCSV
+            // 
+            this.contextMenuCSV.Name = "contextMenuExTable";
+            this.contextMenuCSV.Size = new System.Drawing.Size(61, 4);
             // 
             // in2SqlWF03PanelRigtSqlM
             // 
@@ -266,5 +275,6 @@
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.ContextMenuStrip contextMenuEditCH;
         private System.Windows.Forms.ContextMenuStrip contextMenuCHRoot;
+        private System.Windows.Forms.ContextMenuStrip contextMenuCSV;
     }
 }

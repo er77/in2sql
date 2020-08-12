@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static SqlEngine.in2sqlSvcCloud;
+using static SqlEngine.In2SqlSvcCsv;
 
 namespace SqlEngine
 {
@@ -50,15 +51,72 @@ namespace SqlEngine
                 {
                     In2SqlSvcTool.ExpHandler(er, "initCloudObjects");
                 }
-            }  
+            }
 
 
-            public static void getCloudTablesAndViews(TreeNodeMouseClickEventArgs e)
+        private static void initCsvObjects(ref In2SqlSvcCsv.FolderProperties vCurrCloudObj)
+        {
+            try
+            {
+                if (vCurrCloudObj.Files == null)
+                {
+                    vCurrCloudObj.Files = new List<In2SqlSvcCsv.CloudObjects>();
+                } 
+
+                if (vCurrCloudObj.Files.Count == 0)
+                {
+                    vCurrCloudObj.Files.AddRange(In2SqlSvcCsv.getFileList(vCurrCloudObj.FolderName));
+                }                 
+            }
+            catch (Exception er)
+            {
+                In2SqlSvcTool.ExpHandler(er, "initCloudObjects");
+            }
+        }
+
+        public static void getCsvFilesList (TreeNodeMouseClickEventArgs e)
+        {
+            e.Node.Nodes.Clear();
+            string vCurrFolderName = e.Node.Text;
+             
+            FolderProperties vCurrFolder = In2SqlSvcCsv.vFolderList.Find(item => item.FolderName == vCurrFolderName);
+
+            try
+            {
+               
+                
+               /* e.Node.SelectedImageIndex = 22;
+                e.Node.Tag = "CSV#";
+                TreeNode vNodeTableFolder = new TreeNode("Tables".ToString(), 3, 3);
+                vNodeTableFolder.Tag = vCurrFolder.FolderName + "_csv";
+                e.Node.Nodes.Add(vNodeTableFolder);
+                */
+                initCsvObjects(ref vCurrFolder);
+
+                foreach (var vCurrFile in vCurrFolder.Files)
+                {
+                    TreeNode vNodeTable = new TreeNode(vCurrFile.Name, 22, 22);
+                    vNodeTable.Tag = vCurrFolder.FolderName + "|" + vCurrFile.Name + "|$FILE_CSV$";
+                    e.Node.Nodes.Add(vNodeTable);
+                    TreeNode vNodeColumnTbl = new TreeNode(" ".ToString(), 99, 99);
+                    vNodeColumnTbl.Tag = vCurrFolder.FolderName + "." + vCurrFile.Name;
+                    vNodeTable.Nodes.Add(vNodeColumnTbl);
+                }
+ 
+                return;
+            }
+            catch (Exception er)
+            {
+                In2SqlSvcTool.ExpHandler(er, "getCsvFilesList 1 ");
+            }
+        }
+
+        public static void getCloudTablesAndViews(TreeNodeMouseClickEventArgs e)
             {
                 e.Node.Nodes.Clear();
                 string vCurrCloudName = e.Node.Text; 
 
-                CloudProperties vCurrCloud = in2sqlSvcCloud.vCloudList.Find(item => item.CloudName == vCurrCloudName);
+                CloudProperties vCurrCloud = in2sqlSvcCloud.vFolderList.Find(item => item.CloudName == vCurrCloudName);
 
                 try
                 {
@@ -107,8 +165,42 @@ namespace SqlEngine
                 }
             }
 
-         
-            public static void getColumnsAndIndexes(TreeNodeMouseClickEventArgs e)
+        public static void getCsvHeaders (TreeNodeMouseClickEventArgs e)
+        {
+            try
+            {
+                String vNodeTag = e.Node.Parent.Text + '.' + e.Node.Text;
+
+                FilesAndProperties vCurrObjProp = In2SqlSvcCsv.vFileObjProp.Find(item => item.ObjName == vNodeTag); 
+
+                if (vCurrObjProp.objColumns == null)
+                {
+                    In2SqlSvcCsv.vFileObjProp.AddRange(In2SqlSvcCsv.getCsvFileColumn(e.Node.Parent.Text, e.Node.Text));
+                    vCurrObjProp = In2SqlSvcCsv.vFileObjProp.Find(item => item.ObjName == vNodeTag);
+                }
+
+                if (vCurrObjProp.objColumns != null)
+                    if (vCurrObjProp.objColumns.Count > 0)
+                    {
+                        e.Node.Nodes.Clear();
+
+                        foreach (var vCurrColumn in vCurrObjProp.objColumns)
+                        {
+                            TreeNode vNodeColumn = new TreeNode(vCurrColumn.ToString(), 14, 14);
+                            vNodeColumn.Tag = vNodeTag + '.' + vCurrColumn + "_clm";
+                            e.Node.Nodes.Add(vNodeColumn);
+                        }
+                    }
+            }
+            catch (Exception er)
+            {
+                In2SqlSvcTool.ExpHandler(er, "getColumnsandIndexes ");
+            }
+
+        }
+
+
+        public static void getColumnsAndIndexes(TreeNodeMouseClickEventArgs e)
             {
                 try
                 {

@@ -581,6 +581,10 @@ namespace SqlEngine
             {
                 vActivCell.ListObject.QueryTable.CommandText = vCTR.Sql;
                 objRefreshHistory(vActivCell.ListObject, vIsUndoList);
+
+                if (vIsUndoList == 1)
+                    In2SqlSvcUndoManagment.addToUndoList(vActivCell.ListObject.Name, vCTR.Sql);
+
             }
 
             if (vCTR.TypeConnection.Contains("CLOUD"))
@@ -593,10 +597,10 @@ namespace SqlEngine
                                                    , vCTR.CurrCloudExTName);
 
                 In2SqlSvcTool.addSqlLog(vCTR.Sql);
-                if (vIsUndoList ==1 )
-                    In2SqlSvcUndoManagment.addToUndoList(vActivCell.ListObject.Name, vCTR.Sql);
-
+                if (vIsUndoList == 1)
+                    In2SqlSvcUndoManagment.addToUndoList(vCTR.CurrCloudExTName, vCTR.Sql);
             }
+
         }
 
         public static void Undo()

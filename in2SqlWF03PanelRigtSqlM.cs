@@ -144,14 +144,20 @@ namespace SqlEngine
         {
             try
             {
-                TreeNode rootNode = new TreeNode("ODBC".ToString());
+                TreeNode rootNode = new TreeNode("odbc" );
                 rootNode.Tag = "root";
                 GetODbcRecords(rootNode, vIsUI);
-                treeODBC.Nodes.Add(rootNode);
+                treeODBC.Nodes.Add(rootNode); 
 
-                TreeNode rootCloud = new TreeNode("Cloud".ToString(), 18, 18);
+                TreeNode rootCSV = new TreeNode("csv", 20, 20);
+                rootCSV.Tag = "CSV";
+                GetCSVRecords(rootCSV);
+                treeODBC.Nodes.Add(rootCSV);
+
+                TreeNode rootCloud = new TreeNode("cloud", 18, 18);
                 rootCloud.Tag = "cloud";
-                TreeNode tnClickHouse = new TreeNode("ClickHouse".ToString(), 19, 19);
+
+                TreeNode tnClickHouse = new TreeNode("ClickHouse" , 19, 19);
                 tnClickHouse.Tag = "ClickHouse";
                 GetCloudRecords(tnClickHouse, "CloudCH");
                 rootCloud.Nodes.Add(tnClickHouse);
@@ -171,14 +177,32 @@ namespace SqlEngine
         {
             try
             {
-                in2sqlSvcCloud.vCloudList = in2sqlSvcCloud.CloudList();
+                in2sqlSvcCloud.vFolderList = in2sqlSvcCloud.CloudList();
 
-                foreach (var vCurrCloudList in in2sqlSvcCloud.vCloudList)
+                foreach (var vCurrCloudList in in2sqlSvcCloud.vFolderList)
                 { 
                     if (vCurrCloudList.CloudType.Contains(vCloudType))
                         in2SqlRightPaneTreeTables.setODBCTreeLineSimple(nodeToAddTo, vCurrCloudList.CloudName, vCloudType+'$');
                 }                     
                     return;                               
+            }
+            catch (Exception er)
+            {
+                In2SqlSvcTool.ExpHandler(er, "GetCloudRecords");
+            }
+        }
+
+        private void GetCSVRecords(TreeNode nodeToAddTo )
+        {
+            try
+            {
+                In2SqlSvcCsv.vFolderList = In2SqlSvcCsv.FolderList();
+
+                foreach (var vCurrFolder in In2SqlSvcCsv.vFolderList)
+                {
+                      in2SqlRightPaneTreeTables.setCSVTreeLineSimple(nodeToAddTo, vCurrFolder.FolderName,   "CSV$");
+                }
+                return;
             }
             catch (Exception er)
             {
@@ -192,7 +216,7 @@ namespace SqlEngine
             try
             {
 
-                foreach (var vCurrCloudList in in2sqlSvcCloud.vCloudList)
+                foreach (var vCurrCloudList in in2sqlSvcCloud.vFolderList)
                 {
                     string vv = vCurrCloudList.CloudName;
                 }
@@ -284,6 +308,46 @@ namespace SqlEngine
                 miSelectNode.SelectedImageIndex = 1;
                 miSelectNode.Tag = "ODBC$";
             }
+        }
+
+        //
+
+
+        private void clickCSV_Click(object sender, EventArgs e)
+        {
+            if (sender.ToString().Contains("Edit"))
+            {
+               /* string vConnName = miSelectNode.Tag + "." + miSelectNode.Text;
+                vConnName = vConnName.Replace("#", "");
+                vConnName = vConnName.Replace("$", "");
+
+                in2SqlWF09CloudConnectionEditor frmshowCloudCHE = new in2SqlWF09CloudConnectionEditor(vConnName);
+                frmshowCloudCHE.Show();
+                */
+            }
+            else if (sender.ToString().Contains("Create"))
+            {
+               // in2SqlWF09CloudConnectionEditor frmshowCloudCHC = new in2SqlWF09CloudConnectionEditor();
+               // frmshowCloudCHC.Show();
+
+            }
+            else if (sender.ToString().Contains("Refresh"))
+            {
+               // miSelectNode.Nodes.Clear();
+               // GetCloudRecords(miSelectNode, "CloudCH");
+            }
+
+            else if (sender.ToString().Contains("Delete"))
+            {
+               /* in2SqlRegistry.delLocalValue(miSelectNode.Tag + "." + miSelectNode.Text);
+
+                miSelectNode.Text = "";
+                miSelectNode.Tag = "";
+                miSelectNode.Nodes.Clear();
+                miSelectNode.ImageIndex = 990;
+                */
+            }
+
         }
 
         private void clickHouse_Click(object sender, EventArgs e)
@@ -437,23 +501,19 @@ namespace SqlEngine
                                     , clickHouse_Click
                                     , contextMenuEditCH);
                         return;
-                    }
+                    } 
 
-                    if ((e.Button == MouseButtons.Left) & (e.Node.Tag.ToString().Contains("ODBC$")))
-                    {                        
-                        in2SqlRightPaneTreeTables.getTablesAndViews(e);
-                        sqlBuild.setLblConnectionName(e.Node.Text,"ODBC");                     
-                        return;
-                    }
-
-                    if ((e.Button == MouseButtons.Left) & (e.Node.Tag.ToString().ToUpper().Contains("CLOUD")) & (e.Node.Tag.ToString().Contains("$")))
+                    if ((e.Button == MouseButtons.Right) & (e.Node.Tag.ToString().ToUpper().Contains("CSV")) & (e.Node.Text.ToString().ToUpper().Contains("CSV")))
                     {
-                        in2SqlRightPaneTreeCloud.getCloudTablesAndViews(e);
-                        sqlBuild.setLblConnectionName(e.Node.Text, "CLOUD");
+                        contextMenuEditCH = createMenu(
+                                        e
+                                    , new String[] { "Edit CSV","Create","Refresh","Delete" }
+                                    , clickCSV_Click
+                                    , contextMenuCSV);
                         return;
                     }
 
-                    if ((e.Button == MouseButtons.Right) & (e.Node.Tag.ToString().ToUpper().Contains("CLICKHOUSE")) )
+                    if ((e.Button == MouseButtons.Right) & (e.Node.Tag.ToString().ToUpper().Contains("CLICKHOUSE")))
                     {
                         contextMenuCHRoot = createMenu(
                                         e
@@ -464,43 +524,74 @@ namespace SqlEngine
                     }
 
 
-                     
+
                     if ((e.Button == MouseButtons.Right) & (e.Node.Tag.ToString().Contains("ODBC%")))
-                    {    contextMenuOdbcError = createMenu(
-                                    e
-                                    , new String[] { "ReConnect", "Edit", "Login" }
-                                    , rootMenu_Click
-                                    , contextMenuOdbcError);
+                    {
+                        contextMenuOdbcError = createMenu(
+                                   e
+                                   , new String[] { "ReConnect", "Edit", "Login" }
+                                   , rootMenu_Click
+                                   , contextMenuOdbcError);
                         return;
                     }
 
-                    if ((e.Node.Tag.ToString().Contains("VIEW") | e.Node.Tag.ToString().Contains("TABLE")))
-                    {
-                        if (e.Button == MouseButtons.Left | e.Node.Tag.ToString().Contains('$') )
+                    if (e.Node.Parent == null)
+                        return;                    
+
+                        if ((e.Button == MouseButtons.Left) & (e.Node.Tag.ToString().Contains("ODBC$")))
                         {
-                            if (e.Node.Tag.ToString().Contains("CLD") | e.Node.Parent.Parent.Tag.ToString().Contains("Cloud"))
-                            {
-                                in2SqlRightPaneTreeCloud.getColumnsAndIndexes(e);
-                                return;
-                            }
-                            else
-                            {
-                                in2SqlRightPaneTreeTables.getColumnsandIndexes(e);
-                                return;
-
-                            }
-
-                        }
-                        else if (e.Button == MouseButtons.Right)
-                        { 
-                                this.contextMenuTable = createMenu(
-                                    e
-                                    , new String[] { "to Table", "to PivotTable",  "to Sql Editor", "get Properties" }
-                                    , RegularObjecteMenu_Click
-                                    , this.contextMenuTable);
+                            in2SqlRightPaneTreeTables.getTablesAndViews(e);
+                            sqlBuild.setLblConnectionName(e.Node.Text, "ODBC");
                             return;
                         }
+
+                        if ((e.Button == MouseButtons.Left) & (e.Node.Tag.ToString().ToUpper().Contains("CSV")) & (e.Node.Tag.ToString().Contains("$")) & (e.Node.Parent.Text.ToString().ToUpper().Contains("CSV")))
+                        {
+                            in2SqlRightPaneTreeCloud.getCsvFilesList(e);
+                            sqlBuild.setLblConnectionName(e.Node.Text, "CSV");
+                            return;
+                        }
+
+                    if ((e.Button == MouseButtons.Left) & (e.Node.Tag.ToString().ToUpper().Contains("CSV")) & (e.Node.Tag.ToString().Contains("$")) & (e.Node.Parent.Text.ToString().ToUpper().Contains("CSV")))
+                    {
+                        in2SqlRightPaneTreeCloud.getCsvFilesList(e);
+                        sqlBuild.setLblConnectionName(e.Node.Text, "CSV");
+                        return;
                     }
+
+                    if ((e.Button == MouseButtons.Left) & (e.Node.Tag.ToString().ToUpper().Contains("$FILE_CSV$")) )
+                        {
+                            in2SqlRightPaneTreeCloud.getCsvHeaders(e);
+                        return;
+                        }
+
+                        if ((e.Node.Tag.ToString().Contains("VIEW") | e.Node.Tag.ToString().Contains("TABLE")))
+                        {
+                            if (e.Button == MouseButtons.Left | e.Node.Tag.ToString().Contains('$'))
+                            {
+                                if (e.Node.Tag.ToString().Contains("CLD") | e.Node.Parent.Parent.Tag.ToString().Contains("Cloud"))
+                                {
+                                    in2SqlRightPaneTreeCloud.getColumnsAndIndexes(e);
+                                    return;
+                                }
+                                else
+                                {
+                                    in2SqlRightPaneTreeTables.getColumnsandIndexes(e);
+                                    return;
+
+                                }
+
+                            }
+                            else if (e.Button == MouseButtons.Right)
+                            {
+                                this.contextMenuTable = createMenu(
+                                    e
+                                    , new String[] { "to Table", "to PivotTable", "to Sql Editor", "get Properties" }
+                                    , RegularObjecteMenu_Click
+                                    , this.contextMenuTable);
+                                return;
+                            }
+                        }                    
                 }
             }
             catch (Exception er)
