@@ -33,6 +33,7 @@
             this.contextMenuSqlConnections = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.SqlConnectionsToolStripDropDown = new System.Windows.Forms.ToolStripDropDownButton();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.SqlDocument = new FastColoredTextBoxNS.FastColoredTextBox();
             this.ConnName = new System.Windows.Forms.Label();
             this.toolSqlConnections = new System.Windows.Forms.ToolStrip();
             this.newToolStripButton = new System.Windows.Forms.ToolStripButton();
@@ -51,17 +52,16 @@
             this.SqlDataResult = new System.Windows.Forms.DataGridView();
             this.SQLHistory = new System.Windows.Forms.TabPage();
             this.SqlHistoryLog = new System.Windows.Forms.RichTextBox();
-            this.SqlDocument = new FastColoredTextBoxNS.FastColoredTextBox();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.SqlDocument)).BeginInit();
             this.toolSqlConnections.SuspendLayout();
             this.SqlResult.SuspendLayout();
             this.SQLDataGrid.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SqlDataResult)).BeginInit();
             this.SQLHistory.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.SqlDocument)).BeginInit();
             this.SuspendLayout();
             // 
             // contextMenuSqlConnections
@@ -102,6 +102,39 @@
             this.splitContainer1.Size = new System.Drawing.Size(591, 797);
             this.splitContainer1.SplitterDistance = 480;
             this.splitContainer1.TabIndex = 7;
+            // 
+            // SqlDocument
+            // 
+            this.SqlDocument.AutoCompleteBracketsList = new char[] {
+        '(',
+        ')',
+        '{',
+        '}',
+        '[',
+        ']',
+        '\"',
+        '\"',
+        '\'',
+        '\''};
+            this.SqlDocument.AutoScrollMinSize = new System.Drawing.Size(179, 14);
+            this.SqlDocument.AutoSize = true;
+            this.SqlDocument.BackBrush = null;
+            this.SqlDocument.CharHeight = 14;
+            this.SqlDocument.CharWidth = 8;
+            this.SqlDocument.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.SqlDocument.DisabledColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))));
+            this.SqlDocument.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.SqlDocument.IsReplaceMode = false;
+            this.SqlDocument.Location = new System.Drawing.Point(0, 25);
+            this.SqlDocument.Name = "SqlDocument";
+            this.SqlDocument.Paddings = new System.Windows.Forms.Padding(0);
+            this.SqlDocument.SelectionColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(255)))));
+            this.SqlDocument.ServiceColors = ((FastColoredTextBoxNS.ServiceColors)(resources.GetObject("SqlDocument.ServiceColors")));
+            this.SqlDocument.Size = new System.Drawing.Size(591, 455);
+            this.SqlDocument.TabIndex = 9;
+            this.SqlDocument.Text = "fastColoredTextBox1";
+            this.SqlDocument.Zoom = 100;
+            this.SqlDocument.Load += new System.EventHandler(this.SqlDocument_Load);
             // 
             // ConnName
             // 
@@ -225,6 +258,7 @@
             this.SaveToExTable.Name = "SaveToExTable";
             this.SaveToExTable.Size = new System.Drawing.Size(32, 22);
             this.SaveToExTable.Text = "Excel Table";
+            this.SaveToExTable.ButtonClick += new System.EventHandler(this.SaveToExTable_ButtonClick);
             this.SaveToExTable.Click += new System.EventHandler(this.EditTollMenu_Click);
             // 
             // SqlResult
@@ -287,40 +321,6 @@
             this.SqlHistoryLog.TabIndex = 1;
             this.SqlHistoryLog.Text = "";
             // 
-            // SqlDocument
-            // 
-            this.SqlDocument.AutoCompleteBracketsList = new char[] {
-        '(',
-        ')',
-        '{',
-        '}',
-        '[',
-        ']',
-        '\"',
-        '\"',
-        '\'',
-        '\''};
-            this.SqlDocument.AutoScrollMinSize = new System.Drawing.Size(179, 14);
-            this.SqlDocument.AutoSize = true;
-            this.SqlDocument.BackBrush = null;
-            this.SqlDocument.CharHeight = 14;
-            this.SqlDocument.CharWidth = 8;
-            this.SqlDocument.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.SqlDocument.DisabledColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))));
-            this.SqlDocument.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.SqlDocument.Font = new System.Drawing.Font("Courier New", 9.75F);
-            this.SqlDocument.IsReplaceMode = false;
-            this.SqlDocument.Location = new System.Drawing.Point(0, 25);
-            this.SqlDocument.Name = "SqlDocument";
-            this.SqlDocument.Paddings = new System.Windows.Forms.Padding(0);
-            this.SqlDocument.SelectionColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(255)))));
-            this.SqlDocument.ServiceColors = ((FastColoredTextBoxNS.ServiceColors)(resources.GetObject("SqlDocument.ServiceColors")));
-            this.SqlDocument.Size = new System.Drawing.Size(591, 455);
-            this.SqlDocument.TabIndex = 9;
-            this.SqlDocument.Text = "fastColoredTextBox1";
-            this.SqlDocument.Zoom = 100;
-            this.SqlDocument.Load += new System.EventHandler(this.SqlDocument_Load);
-            // 
             // in2SqlWF05SqlEngine
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -337,13 +337,13 @@
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.SqlDocument)).EndInit();
             this.toolSqlConnections.ResumeLayout(false);
             this.toolSqlConnections.PerformLayout();
             this.SqlResult.ResumeLayout(false);
             this.SQLDataGrid.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.SqlDataResult)).EndInit();
             this.SQLHistory.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.SqlDocument)).EndInit();
             this.ResumeLayout(false);
 
         }

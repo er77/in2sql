@@ -82,7 +82,7 @@ namespace SqlEngine
         public static string GetHash(string input)
         {
             var md5 = MD5.Create();
-            var hash = md5.ComputeHash(Encoding.UTF8.GetBytes(input));
+            var hash = md5.ComputeHash(Encoding.ASCII.GetBytes(input));
 
             return Convert.ToBase64String(hash);
         }
@@ -218,6 +218,11 @@ namespace SqlEngine
 
         public static IEnumerable<String> HttpGetArray(string vHttpUrl)
         {
+            vHttpUrl = vHttpUrl.Replace("\n", " ");
+            vHttpUrl = vHttpUrl.Replace("\r", " ");
+            vHttpUrl = vHttpUrl.Replace("\t", " ");
+            vHttpUrl = vHttpUrl.Replace("/*`*/", " ");
+            vHttpUrl = vHttpUrl.Replace("  ", " ");
 
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(vHttpUrl);
             request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;

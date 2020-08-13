@@ -92,11 +92,29 @@ namespace SqlEngine
             svf = null;
         }
 
-        BackgroundWorker bw  = new BackgroundWorker();    
+        BackgroundWorker bw  = new BackgroundWorker();  
+        
+        private string getSql ()
+        {
+            string qstr = SqlDocument.SelectedText;
+
+            if (qstr == "")
+                qstr = SqlDocument.Text;
+
+            qstr = qstr.Replace(System.Environment.NewLine, " ");
+            qstr = qstr.Replace("\r", " ");
+            qstr = qstr.Replace("\n", " ");
+            qstr = qstr.Replace("\t", " ");
+            qstr = qstr.Trim();
+            return qstr;
+        }
 
         private void EditTollMenu_Click(object sender, EventArgs e)
         {
             In2SqlSvcTool.RunGarbageCollector();
+
+            SqlDocument.ReadOnly = true;
+            string qstr = getSql(); 
 
             if (sender.ToString().Contains("New"))
                 SqlDocument.Clear();
@@ -123,43 +141,23 @@ namespace SqlEngine
                 SqlDocument.Paste();
 
             else if (sender.ToString().Contains("sqlRun"))            
-                if (bw.IsBusy == false )
-                {
-                    SqlDocument.ReadOnly = true;
-                    string qstr = SqlDocument.SelectedText;
-
-                    if (qstr == "")
-                        qstr = SqlDocument.Text;
-
-                    SqlDataResult.SelectAll();
-                    SqlDataResult.ClearSelection();
-
-                    /*   bw.DoWork += (obj, ea) => sqlExecuteandDataGrid(qstr);
-                       bw.RunWorkerCompleted += Bw_RunWorkerCompleted;
-                       bw.RunWorkerAsync();*/
-                    sqlExecuteandDataGrid(qstr);
-                    SqlDocument.ReadOnly = false;
-                }   
-            else
+                if (bw.IsBusy == false )                                     
+                    sqlExecuteandDataGrid(qstr);                          
+                else
                     MessageBox.Show("This Sql Engine is busy. Please create new one", "sql run event",
-                                                                                   MessageBoxButtons.OK, MessageBoxIcon.Warning);
-
-            // sqlExecuteandDataGrid(SqlDocument );
+                                                                                   MessageBoxButtons.OK, MessageBoxIcon.Warning);             
 
             else if (sender.ToString().Contains("SqlConnections"))
                 ConnectionDropDownMenu();
 
             else if (sender.ToString().Contains("Excel"))
-            {
-                String qstr = SqlDocument.SelectedText;
-                if (qstr == "")
-                    qstr = SqlDocument.Text;
-                intSqlVBAEngine.createExTable(ConnName.Text, In2SqlSvcTool.GetHash(qstr), qstr);
-            }
+                sqlExecExcel(qstr);
 
             else
                 MessageBox.Show(string.Concat("You have Clicked '", sender.ToString(), "' Menu"), "Menu Items Event",
                                                                         MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+            SqlDocument.ReadOnly = false;
 
         }
 
@@ -230,11 +228,11 @@ namespace SqlEngine
             }
         }
 
-        private  void  sqlExecuteandDataGrid(string  SqlCommand)
+        private void sqlExecuteandDataGrid(string SqlCommand)
         {
-           // await Task.Delay(1);
-           
-            if (ConnName.Text.Equals("SQL"))
+            // await Task.Delay(1);
+
+            if (ConnName.Text.Equals("SQL") | ConnName.Text == "")
             {
                 MessageBox.Show("Please select Sql connection on the rigth drop-down menu", "sql run event",
                                                                                        MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -243,25 +241,52 @@ namespace SqlEngine
 
             try
             {
-                
+                SqlDataResult.SelectAll();
+                SqlDataResult.ClearSelection();
+
                 string[] vTempName = ConnName.Text.Split('|');
                 string vOdbcName = vTempName[0].Trim();
                 if (vTempName.Count() > 1)
                     if (vTempName[1].ToUpper().Contains("ODBC"))
                         OdbcGrid(vOdbcName, SqlCommand);
                     else if (vTempName[1].ToUpper().Contains("CLOUD"))
-                        CloudGrid(vOdbcName, SqlCommand);
-
- 
-                
+                        CloudGrid(vOdbcName, SqlCommand); 
             }
             catch (Exception e)
             {
                 if ((e.HResult == -2147024809) == false)
                     In2SqlSvcTool.ExpHandler(e, "sqlExecuteandDataGrid");                    
+            } 
+        }
+
+        private void sqlExecExcel(string qstr)
+        {
+            // await Task.Delay(1);
+
+            if (ConnName.Text.Equals("SQL"))
+            {
+                MessageBox.Show("Please select Sql connection on the rigth drop-down menu", "sql run event",
+                                                                                       MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
             }
-           
-             
+
+            try
+            {   string[] vTempName = ConnName.Text.Split('|');
+                string vOdbcName = vTempName[0].Trim();
+                qstr = "select * from ( " + qstr + " ) df where 1=1 ";
+                if (vTempName.Count() > 1)
+                    if (vTempName[1].ToUpper().Contains("ODBC"))
+                         intSqlVBAEngine.createExTable(ConnName.Text, In2SqlSvcTool.GetHash(qstr), qstr);
+                    
+                    else if (vTempName[1].ToUpper().Contains("CLOUD"))                    
+                         In2SqlVBAEngineCloud.createExTable(vOdbcName, In2SqlSvcTool.GetHash(qstr), qstr);
+                    
+            }
+            catch (Exception e)
+            {
+                if ((e.HResult == -2147024809) == false)
+                    In2SqlSvcTool.ExpHandler(e, "sqlExecuteandDataGrid");
+            }
         }
 
 
@@ -279,6 +304,11 @@ namespace SqlEngine
         private void SqlDocument_Load(object sender, EventArgs e)
         {
             SqlDocument.Text = " Free Sql  Manager \n\r  https://t.me/in2sql  \n\r https://sourceforge.net/projects/in2sql/ \n\r er@essbase.ru ";
+        }
+
+        private void SaveToExTable_ButtonClick(object sender, EventArgs e)
+        {
+
         }
     }
 }
