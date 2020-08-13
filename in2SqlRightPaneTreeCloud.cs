@@ -116,7 +116,7 @@ namespace SqlEngine
                 e.Node.Nodes.Clear();
                 string vCurrCloudName = e.Node.Text; 
 
-                CloudProperties vCurrCloud = in2sqlSvcCloud.vFolderList.Find(item => item.CloudName == vCurrCloudName);
+                CloudProperties vCurrCloud = in2sqlSvcCloud.vCloudList.Find(item => item.CloudName == vCurrCloudName);
 
                 try
                 {

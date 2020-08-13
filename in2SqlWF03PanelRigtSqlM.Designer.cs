@@ -90,7 +90,8 @@
             // contextMenuTable
             // 
             this.contextMenuTable.Name = "contextMenuStrip1";
-            this.contextMenuTable.Size = new System.Drawing.Size(61, 4);
+            this.contextMenuTable.Size = new System.Drawing.Size(181, 26);
+            this.contextMenuTable.Opening += new System.ComponentModel.CancelEventHandler(this.contextMenuTable_Opening);
             // 
             // contextMenuExcelRoot
             // 

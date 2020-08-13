@@ -121,6 +121,12 @@ namespace SqlEngine
                     vCurrRegKey.DeleteValue(vOdbcName + ".Url");
                 }
 
+
+                if (vOdbcName.Contains("Csv"))
+                {
+                    vCurrRegKey.DeleteValue(vOdbcName + ".Path");                    
+                }
+
                 vCurrRegKey.Close();
             }
             catch (Exception e)

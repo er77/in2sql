@@ -23,21 +23,21 @@ namespace SqlEngine
         {
             public List<String> objColumns;
             public List<String> objIndexes;
-            public List<String> objDependencies;
+          //  public List<String> objDependencies;
             public String ObjName;
         }
 
         public struct CloudProperties
         {
             public string CloudName, CloudType, Url, Login, Password;
-            public int ConnStatus;
+          //  public int ConnStatus;
             public List<CloudObjects> Tables;
             public List<CloudObjects> Views;
             public List<CloudObjects> SQLProgramms;
             public List<CloudObjects> SQLFunctions;
         }
 
-        public static List<CloudProperties> vFolderList = CloudList();
+        public static List<CloudProperties> vCloudList = CloudList();
 
         public static List<ObjectsAndProperties> vCloudObjProp = new List<ObjectsAndProperties>();
 
@@ -71,7 +71,7 @@ namespace SqlEngine
             if (vCurrSql == null | vCloudName == null | vCurrSql == "" | vCloudName == "")
                 return "";
 
-            CloudProperties vCurrCloud = in2sqlSvcCloud.vFolderList.Find(item => item.CloudName == vCloudName);
+            CloudProperties vCurrCloud = in2sqlSvcCloud.vCloudList.Find(item => item.CloudName == vCloudName);
 
             if (vCurrCloud.CloudName == null)
                 return "";
@@ -90,7 +90,7 @@ namespace SqlEngine
         public static int checkCloudState (string  vCurrCloudName)
         {
 
-            CloudProperties vCurrCloud = vFolderList.Find(item => item.CloudName == vCurrCloudName);
+            CloudProperties vCurrCloud = vCloudList.Find(item => item.CloudName == vCurrCloudName);
 
             string vSqlURL  = prepareCloudQuery(vCurrCloudName, in2SqlLibrary.getCloudSqlCheck(vCurrCloud.CloudType) );
             vSqlURL = In2SqlSvcTool.HttpGet(vSqlURL);
@@ -105,14 +105,14 @@ namespace SqlEngine
 
         public static string getCloudType(string vCurrCloudName)
         {
-            CloudProperties vCurrCloud = vFolderList.Find(item => item.CloudName == vCurrCloudName);
+            CloudProperties vCurrCloud = vCloudList.Find(item => item.CloudName == vCurrCloudName);
             return vCurrCloud.CloudType;
         }
 
  
         public static IEnumerable<CloudObjects> getCloudTableList(string vCurrCloudName)
             {
-            CloudProperties vCurrCloud = vFolderList.Find(item => item.CloudName == vCurrCloudName);
+            CloudProperties vCurrCloud = vCloudList.Find(item => item.CloudName == vCurrCloudName);
             string vSqlURL;
 
             vSqlURL = prepareCloudQuery(vCurrCloudName, in2SqlLibrary.getCloudSqlTable(vCurrCloud.CloudType));
@@ -123,7 +123,7 @@ namespace SqlEngine
 
         public static IEnumerable<CloudObjects> getCloudViewList(string vCurrCloudName)
         {
-            CloudProperties vCurrCloud = vFolderList.Find(item => item.CloudName == vCurrCloudName);
+            CloudProperties vCurrCloud = vCloudList.Find(item => item.CloudName == vCurrCloudName);
             string vSqlURL;
 
             vSqlURL = prepareCloudQuery(vCurrCloudName, in2SqlLibrary.getCloudSqlView(vCurrCloud.CloudType));
@@ -155,7 +155,7 @@ namespace SqlEngine
 
         public static IEnumerable<ObjectsAndProperties> getObjectProperties(string vCurrCloudName, string vObjName)
         {
-            CloudProperties vCurrCloud = vFolderList.Find(item => item.CloudName == vCurrCloudName);
+            CloudProperties vCurrCloud = vCloudList.Find(item => item.CloudName == vCurrCloudName);
             string vSqlURL;
 
             vSqlURL = prepareCloudQuery(vCurrCloudName, in2SqlLibrary.getCloudColumns(vCurrCloud.CloudType));

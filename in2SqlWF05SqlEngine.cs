@@ -38,7 +38,7 @@ namespace SqlEngine
             }
             SqlConnectionsToolStripDropDown.DropDown = contextMenuSqlConnections;
 
-            foreach (var vCurrvCloud in in2sqlSvcCloud.vFolderList)
+            foreach (var vCurrvCloud in in2sqlSvcCloud.vCloudList)
             {
                 ToolStripMenuItem vCurrConnMenu = new ToolStripMenuItem(vCurrvCloud.CloudName + " | cloud");
                 vCurrConnMenu.Click += Connection_Click;
