@@ -198,6 +198,7 @@ namespace SqlEngine
         public   void TBJoiner_DragDrop(object sender, DragEventArgs e)
         {
             string str = e.Data.GetData(DataFormats.Text).ToString();
+          //  var miSelectNode = in2SqlWF03PanelRigtSqlM.getNode(e.X, e.Y);
             //MessageBox.Show(str);
 
             TreeNode vtb = in2SqlWF03PanelRigtSqlM.CurrSqlPanel.findeTable(str, getLblConnectionName());

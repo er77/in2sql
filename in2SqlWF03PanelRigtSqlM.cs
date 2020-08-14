@@ -68,6 +68,13 @@ namespace SqlEngine
  
         }
 
+        public static TreeNode getNode ( int X, int Y )
+
+        {
+            return
+                  CurrSqlPanel.treeODBC.GetNodeAt(X, Y); 
+        }
+
         private void newToolStripButton_Click(object sender, EventArgs e)
         {
             tabControl1.TabPages.Add("N1");
@@ -388,24 +395,26 @@ namespace SqlEngine
         {
 
             // Find the node specified by the user.
+          /*  if (vODBCName == "" | NodeName == "" )
+                return null;
+                */
             fTN = null;
             foreach (TreeNode tn in this.treeODBC.Nodes) {
-                if (tn.Text.Equals("ODBC"))
-                { foreach (TreeNode tn1 in tn.Nodes )
-                    {
-                        if (tn1.Text.Equals(vODBCName))
-                        {
+             //   if (tn.Text.Equals("ODBC"))
+                 foreach (TreeNode tn1 in tn.Nodes )
+                   {
+                      //  if (tn1.Text.Equals(vODBCName))
+                        //{
                             FindTreeNode(tn1, NodeName);
-                        }
+                       // }
                         if ((fTN == null) == false)
                             break;
-                    }
-                   
-                }
-            }
-
-            return fTN; 
-         }
+                    }                   
+                
+            } 
+                return fTN;
+ 
+        }
                   
 
         private void ExTableMenu_Click(object sender, EventArgs e)
