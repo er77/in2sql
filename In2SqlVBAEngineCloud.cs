@@ -119,7 +119,7 @@ namespace SqlEngine
                      vExTName = vCurrCloudName + "|" + vTableName + '|' + DateTime.Now.ToString("YYYYMMDDTHHmmss");
                 try
                 {
-                    vCurrWorkSheet.ListObjects(vExTName).Delete();
+                     vCurrWorkSheet.ListObjects(vExTName).Delete();
                 }
                 catch { }
 
@@ -130,6 +130,8 @@ namespace SqlEngine
                 intSqlVBAEngine.GetSelectedTab();
 
                 SqlEngine.currExcelApp.ScreenUpdating = true;
+
+                intSqlVBAEngine.GetSelectedTab();
                 return;
             }          
                 

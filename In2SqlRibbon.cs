@@ -40,14 +40,14 @@ namespace SqlEngine
                 vcurrPannel.BookName = SqlEngine.currExcelApp.ActiveWorkbook.Name;
 
                 vcurrPannel.leftPaneCntrlOtl = new in2SqlWF02PaneLeftOtline();
-                vcurrPannel.objIn2sqlLeftOtl = Globals.SqlEngine.CustomTaskPanes.Add(vcurrPannel.leftPaneCntrlOtl, "Outline");
+                vcurrPannel.objIn2sqlLeftOtl = Globals.SqlEngine.CustomTaskPanes.Add(vcurrPannel.leftPaneCntrlOtl, "in2Sql.outline");
                 vcurrPannel.objIn2sqlLeftOtl.DockPosition = Office.MsoCTPDockPosition.msoCTPDockPositionLeft;
                 vcurrPannel.objIn2sqlLeftOtl.DockPositionRestrict = Office.MsoCTPDockPositionRestrict.msoCTPDockPositionRestrictNoChange;
                 vcurrPannel.objIn2sqlLeftOtl.Visible = false;
                 vcurrPannel.objIn2sqlLeftOtl.Width = 200;
 
                 vcurrPannel.rightPaneCntrlSqlm = new in2SqlWF03PanelRigtSqlM();
-                vcurrPannel.objPanelRigtSqlM = Globals.SqlEngine.CustomTaskPanes.Add(vcurrPannel.rightPaneCntrlSqlm, "in2sql");
+                vcurrPannel.objPanelRigtSqlM = Globals.SqlEngine.CustomTaskPanes.Add(vcurrPannel.rightPaneCntrlSqlm, "in2Sql.explorer");
                 vcurrPannel.objPanelRigtSqlM.DockPosition = Office.MsoCTPDockPosition.msoCTPDockPositionRight;
                 vcurrPannel.objPanelRigtSqlM.DockPositionRestrict = Office.MsoCTPDockPositionRestrict.msoCTPDockPositionRestrictNoChange;
                 vcurrPannel.objPanelRigtSqlM.Visible = false;

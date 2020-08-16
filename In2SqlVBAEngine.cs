@@ -349,7 +349,7 @@ namespace SqlEngine
             System.Windows.Forms.MessageBox.Show(" Please select empty area  in Excel data grid");
         }
 
-        /*****************333******************/
+       
 
         private static void CurrExcelApp_SheetChange(object Sh, Excel.Range vRange)
         {
@@ -473,7 +473,7 @@ namespace SqlEngine
                         isRefresh = true;
                         vActivCell.ListObject.ListColumns[i].Range.NumberFormat = "yyyy.mm.dd hh:mm:ss";
                     }
-                } /*************************888888*/
+                }  
                 vActivCell.ListObject.Range.Interior.Color = XlRgbColor.rgbWhite;
                 vActivCell.ListObject.HeaderRowRange.Interior.Color = XlRgbColor.rgbSkyBlue;
 
@@ -670,28 +670,54 @@ namespace SqlEngine
 
         public static void RibbonRefresh()
         { try
-            {
+            { //eeee
                 isRefresh = true;
+
                 var vActivCell = SqlEngine.currExcelApp.ActiveCell;
+                
 
-                if ((vActivCell.ListObject == null) == false)
-                { 
-                    objRefreshHistory(vActivCell.ListObject);  
-                    return;
-                }
+                In2SqlSvcTool.CurrentTableRecords vCTR = In2SqlSvcTool.getCurrentSql();
 
-                if ((vActivCell.PivotTable == null) == false)
+                if (vCTR.TypeConnection.Contains("ODBC"))
                 {
-                    vActivCell.PivotTable.RefreshTable();
-                    return;
+                    
+
+                    if ((vActivCell.ListObject != null) )
+                    {
+                        objRefreshHistory(vActivCell.ListObject);
+                        isRefresh = false;
+                        return;
+                    }
+
+                    if ((vActivCell.PivotTable != null) )
+                    {
+                        vActivCell.PivotTable.RefreshTable();
+                        isRefresh = false;
+                        return;
+                    }
                 }
+
+                if (vCTR.TypeConnection.Contains("CLOUD"))
+                {
+                    In2SqlVBAEngineCloud.createExTable(
+                                     vCTR.CurrCloudName
+                                   , vCTR.TableName
+                                   , vCTR.Sql
+                                   , 1
+                                   , vCTR.CurrCloudExTName);
+                    isRefresh = false;
+                    return;
+
+                }
+
                 isRefresh = false;
                 MessageBox.Show(" Please, select cell from the table", " Refresh error");
             }
-            catch {
-                MessageBox.Show(" Please, select cell from the table", " Refresh error");
+            catch  { 
+            isRefresh = false;
+            MessageBox.Show(" Please, select cell from the table", " Refresh error");
             }
-            GetSelectedTab();
+            
         }
 
         public static void RibbonPivotExcel()
