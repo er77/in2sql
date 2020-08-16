@@ -539,7 +539,26 @@ namespace SqlEngine
                 {
                     foreach (Microsoft.Office.Interop.Excel.ListObject vTable in vCurrWorkSheet.ListObjects)
                     {
-                        objRefreshHistory(vTable); 
+                        In2SqlSvcTool.CurrentTableRecords vCTR = In2SqlSvcTool.getCurrentSql();
+                        if (vCTR.TypeConnection.Contains("ODBC"))
+                        {
+                            objRefreshHistory(vTable);
+                            continue;
+                        }
+
+                        if (vCTR.TypeConnection.Contains("CLOUD"))
+                        {
+                            In2SqlVBAEngineCloud.createExTable(
+                                             vCTR.CurrCloudName
+                                           , vCTR.TableName
+                                           , vCTR.Sql
+                                           , 1
+                                           , vCTR.CurrCloudExTName);
+                            isRefresh = false;
+                            return;
+
+                        }
+
                     }
                     foreach (var vTable in vCurrWorkSheet.PivotTables())
                     {
@@ -673,8 +692,7 @@ namespace SqlEngine
             { //eeee
                 isRefresh = true;
 
-                var vActivCell = SqlEngine.currExcelApp.ActiveCell;
-                
+                var vActivCell = SqlEngine.currExcelApp.ActiveCell;                
 
                 In2SqlSvcTool.CurrentTableRecords vCTR = In2SqlSvcTool.getCurrentSql();
 
