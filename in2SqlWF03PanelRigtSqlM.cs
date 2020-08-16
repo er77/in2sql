@@ -448,7 +448,16 @@ namespace SqlEngine
                     In2SqlVBAEngineCloud.createExTable(miSelectNode.Parent.Parent.Text, miSelectNode.Text,null);
                 else
                      intSqlVBAEngine.createExTable(miSelectNode.Parent.Parent.Text, miSelectNode.Text);
- 
+            /* fix me */
+            else if (sender.ToString().Contains("generate CSV"))
+                if (miSelectNode.Parent.Parent.Tag.ToString().ToUpper().Contains("ODBC"))
+                    In2SqlSvcODBC.dumpOdbctoCsv(
+                                     miSelectNode.Parent.Parent.Text
+                                   , "select * from  " + miSelectNode.Text
+                                   , In2SqlSvcCsv.getFirstFolder() + miSelectNode.Text + ".csv");
+                /* else
+                    intSqlVBAEngine.createExTable(miSelectNode.Parent.Parent.Text, miSelectNode.Text);*/
+
             else if (sender.ToString().Contains("Chart"))
                 MessageBox.Show(string.Concat("You have Clicked '", sender.ToString(), "' Menu"), "Menu Items Event",
                                                                          MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -582,7 +591,7 @@ namespace SqlEngine
                         {
                             this.contextMenuTable = createMenu(
                                 e
-                                , new String[] { "to Table", "to PivotTable", "to Sql Editor", "get Properties" }
+                                , new String[] { "to Table", "to PivotTable", "generate CSV"  }
                                 , RegularObjecteMenu_Click
                                 , this.contextMenuTable);
                             return;

@@ -1,10 +1,14 @@
-﻿using Microsoft.Win32;
+﻿using CsvHelper;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Data.Odbc;
+using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace SqlEngine
 {
@@ -351,7 +355,68 @@ namespace SqlEngine
             yield return vObject;
         }
 
+     public static void dumpOdbctoCsv(string vOdbcName, string vSqlCommand, string vCsvFile)
+        {
+            try
+            {
+                int i = 0;
+                string DsnConn = In2SqlSvcODBC.getODBCProperties(vOdbcName, "DSNStr");
 
+                if (DsnConn == null | DsnConn == "")
+                {
+                    MessageBox.Show("Please make the connection by expand list on the left pane ", "sql run event",
+                                                                            MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+
+                using   (OdbcConnection conn = new System.Data.Odbc.OdbcConnection())
+                {
+                    using (OdbcCommand cmnd = new OdbcCommand(vSqlCommand, conn))
+                    {  conn.ConnectionString = DsnConn;
+                       conn.ConnectionTimeout = 5;
+                       conn.Open();
+
+                        In2SqlSvcTool.addSqlLog(vOdbcName, vSqlCommand);
+
+                        OdbcDataReader rd = cmnd.ExecuteReader();
+
+                        object[] output = new object[rd.FieldCount];
+
+                        using (var textWriter = new StreamWriter(@vCsvFile))
+                        {
+                            var writer = new CsvWriter(textWriter, CultureInfo.InvariantCulture);
+                            writer.Configuration.Delimiter = ",";
+                            writer.Configuration.ShouldQuote = (field, context) => true;
+
+                            for (int j = 0; j < rd.FieldCount; j++)
+                            {
+                                output[j] = rd.GetName(j);
+                                writer.WriteField(rd.GetName(j));
+                            }
+
+                            writer.NextRecord();
+                           
+                            while (rd.Read())
+                            {
+                                rd.GetValues(output);
+                                writer.WriteField(output);
+                                writer.NextRecord();
+                                i++;
+                            }
+                            conn.Close();
+                            conn.Dispose();
+                        }
+                    }
+                } 
+                MessageBox.Show("Export completed. \n\r File name is " + vCsvFile + " \n\r Row count:"+ i, "csv export",
+                                                                          MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception e)
+            {
+                if (e.HResult != -2147024809) 
+                    In2SqlSvcTool.ExpHandler(e, "dumpOdbctoCsv");
+            }
+        }
 
 
 

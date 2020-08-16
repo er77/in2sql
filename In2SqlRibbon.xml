@@ -8,7 +8,7 @@
       -->       
       
       <tab id="SqlEngine" label="in2Sql"   visible="true"  keytip="YQA" >
-        <group id="grp_Main0" label="v0.4(beta)"   >
+        <group id="grp_Main0" label="v0.5(beta)"   >
           <button id="ExecConnManager" label="Object Explorer"  onAction="ExecMenuButton"  imageMso="ObjectsGroup"  size = "large"   enabled="1"   />
           <button id="ODBCManager"    label="Manager"  onAction="ExecMenuButton" imageMso="ObjectsUngroup"     enabled="1"  />
           <button id="OdbcProp"    	label="Properties"    	onAction="ExecMenuButton"     imageMso="ApplyMasterPage1"  enabled="1"     />

@@ -38,6 +38,14 @@ namespace SqlEngine
 
         public static List<FilesAndProperties> vFileObjProp = new List<FilesAndProperties>();
 
+        public static string getFirstFolder ()
+        {
+            if (vFolderList != null )
+              return vFolderList[0].Path + "\\";
+
+            return "c:\\Temp\\";
+        }
+
         public static List<FolderProperties> FolderList()
         {
             try
