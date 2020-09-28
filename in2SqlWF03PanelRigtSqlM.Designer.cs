@@ -49,6 +49,7 @@
             this.contextMenuEditCH = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.contextMenuCHRoot = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.contextMenuCSV = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.contextMenuSqLiteRoot = new System.Windows.Forms.ContextMenuStrip(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -86,11 +87,12 @@
             this.ODBCImages.Images.SetKeyName(20, "24_csv.png");
             this.ODBCImages.Images.SetKeyName(21, "25_csv.png");
             this.ODBCImages.Images.SetKeyName(22, "26_csv_file.png");
+            this.ODBCImages.Images.SetKeyName(23, "27_sqlite.png");
             // 
             // contextMenuTable
             // 
             this.contextMenuTable.Name = "contextMenuStrip1";
-            this.contextMenuTable.Size = new System.Drawing.Size(181, 26);
+            this.contextMenuTable.Size = new System.Drawing.Size(61, 4);
             this.contextMenuTable.Opening += new System.ComponentModel.CancelEventHandler(this.contextMenuTable_Opening);
             // 
             // contextMenuExcelRoot
@@ -235,6 +237,11 @@
             this.contextMenuCSV.Name = "contextMenuExTable";
             this.contextMenuCSV.Size = new System.Drawing.Size(61, 4);
             // 
+            // contextMenuSqLiteRoot
+            // 
+            this.contextMenuSqLiteRoot.Name = "contextMenuSqLiteRoot";
+            this.contextMenuSqLiteRoot.Size = new System.Drawing.Size(181, 26);
+            // 
             // in2SqlWF03PanelRigtSqlM
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -277,5 +284,6 @@
         private System.Windows.Forms.ContextMenuStrip contextMenuEditCH;
         private System.Windows.Forms.ContextMenuStrip contextMenuCHRoot;
         private System.Windows.Forms.ContextMenuStrip contextMenuCSV;
+        private System.Windows.Forms.ContextMenuStrip contextMenuSqLiteRoot;
     }
 }

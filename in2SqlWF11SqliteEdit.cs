@@ -3,21 +3,22 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+
 using static SqlEngine.In2SqlSvcCsv;
+
 
 namespace SqlEngine
 {
-    public partial class in2SqlWF10CsvEdit : Form
+    public partial class in2SqlWF11SqliteEdit : Form
     {
         private string vCurrConnection;
-        public in2SqlWF10CsvEdit()
-        { 
 
+        public in2SqlWF11SqliteEdit()
+        {
             this.Cursor = new Cursor(Cursor.Current.Handle);
             int pX = Cursor.Position.X - 300;
             int pY = Cursor.Position.Y - 30;
@@ -26,17 +27,11 @@ namespace SqlEngine
             this.StartPosition = FormStartPosition.Manual;
             this.Location = new Point(pX, pY);
 
-
             refreshList();
+
         }
 
-        private void button2_Click(object sender, EventArgs e)
-        {
-            In2SqlSvcCsv.vFolderList = In2SqlSvcCsv.FolderList();
-            this.Close();
-        }
-
-        private void refreshList ()
+        private void refreshList()
         {
             In2SqlSvcCsv.vFolderList = In2SqlSvcCsv.FolderList();
             CMBoxConnection.Items.Clear();
@@ -47,27 +42,22 @@ namespace SqlEngine
 
         }
 
-        private void wf10Create_Click(object sender, EventArgs e)
+        private void button2_Click(object sender, EventArgs e)
         {
-
-            in2SqlRegistry.setLocalValue("Csv." + CsvName.Text,"Path", CsvPath.Text);
-            refreshList();
-
+            In2SqlSvcCsv.vFolderList = In2SqlSvcCsv.FolderList();
+            this.Close();
         }
 
-        private void label2_Click(object sender, EventArgs e)
-        {
 
-        }
 
-        private void button1_Click(object sender, EventArgs e)  // delete
+        private void button1_Click(object sender, EventArgs e)
         {
             if (vCurrConnection.Length > 2)
             {
                 in2SqlRegistry.delLocalValue("Csv." + vCurrConnection);
                 vCurrConnection = "";
 
-                CsvName.Text = ""; 
+                CsvName.Text = "";
                 CsvPath.Text = "";
                 refreshList();
 
@@ -75,16 +65,10 @@ namespace SqlEngine
             }
         }
 
-        private void CMBoxConnection_SelectedIndexChanged(object sender, EventArgs e)
+        private void wf10Create_Click(object sender, EventArgs e)
         {
-            vCurrConnection = CMBoxConnection.SelectedItem.ToString();    
-;  //		SelectedItem	
-
-            CsvName.Text = vCurrConnection;
-
-            FolderProperties vCurrFolderN = vFolderList.Find(item => item.FolderName == vCurrConnection);
-
-            CsvPath.Text = vCurrFolderN.Path ;
+            in2SqlRegistry.setLocalValue("Csv." + CsvName.Text, "Path", CsvPath.Text);
+            refreshList();
 
         }
 
@@ -96,15 +80,22 @@ namespace SqlEngine
 
                 if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
                 {
-                    CsvPath.Text=fbd.SelectedPath;
+                    CsvPath.Text = fbd.SelectedPath;
 
                 }
             }
         }
 
-        private void in2SqlWF10CsvEdit_Load(object sender, EventArgs e)
+        private void CMBoxConnection_SelectedIndexChanged(object sender, EventArgs e)
         {
+            vCurrConnection = CMBoxConnection.SelectedItem.ToString();
+            
 
+            CsvName.Text = vCurrConnection;
+
+            FolderProperties vCurrFolderN = vFolderList.Find(item => item.FolderName == vCurrConnection);
+
+            CsvPath.Text = vCurrFolderN.Path;
         }
     }
 }

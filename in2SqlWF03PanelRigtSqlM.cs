@@ -166,6 +166,12 @@ namespace SqlEngine
 
                 treeODBC.Nodes.Add(rootCloud);
 
+             /*   TreeNode rootSQLite = new TreeNode("SQLite", 23, 23);
+                rootSQLite.Tag = "SQLite";
+                GetSQLiteRecords(rootSQLite);
+                treeODBC.Nodes.Add(rootSQLite);
+             */
+
                 TreeNode rootCSV = new TreeNode("csv", 20, 20);
                 rootCSV.Tag = "CSV";
                 GetCSVRecords(rootCSV);
@@ -195,6 +201,25 @@ namespace SqlEngine
             {
                 In2SqlSvcTool.ExpHandler(er, "GetCloudRecords");
             }
+        }
+
+        private void GetSQLiteRecords(TreeNode nodeToAddTo)
+        {
+            //try  read from registry my SQLite settings 
+            //{
+              /*  In2SqlSvcCsv.vFolderList = In2SqlSvcCsv.FolderList();
+
+                foreach (var vCurrFolder in In2SqlSvcCsv.vFolderList)
+                {
+                    in2SqlRightPaneTreeTables.setCSVTreeLineSimple(nodeToAddTo, vCurrFolder.FolderName, "CSV$");
+                }
+                return;
+            }
+            catch (Exception er)
+            {
+                In2SqlSvcTool.ExpHandler(er, "GetCloudRecords");
+            }
+              */
         }
 
         private void GetCSVRecords(TreeNode nodeToAddTo )
@@ -371,6 +396,23 @@ namespace SqlEngine
 
         }
 
+
+        private void sqlLight_Click(object sender, EventArgs e)
+        {
+              if (sender.ToString().Contains("Create"))
+            {
+                in2SqlWF11SqliteEdit frmshowSQLite = new in2SqlWF11SqliteEdit();
+                 frmshowSQLite.Show();
+
+            }
+            else if (sender.ToString().Contains("Refresh"))
+            {
+                miSelectNode.Nodes.Clear();
+                //GetCloudRecords(miSelectNode, "CloudCH");
+            } 
+
+        }
+
         private TreeNode fTN = null;
 
         private void  FindTreeNode(TreeNode treeNode , string NodeName )
@@ -517,6 +559,16 @@ namespace SqlEngine
                                     , new String[] { "Create", "Refresh" }
                                     , clickHouse_Click
                                     , contextMenuCHRoot);
+                        return;
+                    }
+
+                    if ((e.Button == MouseButtons.Right) & (e.Node.Tag.ToString().ToUpper().Contains("SQLITE")))
+                    {
+                        contextMenuCHRoot = createMenu(
+                                        e
+                                    , new String[] { "Create", "Refresh" }
+                                    , sqlLight_Click
+                                    , contextMenuSqLiteRoot);
                         return;
                     }
 
