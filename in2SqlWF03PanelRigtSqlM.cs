@@ -166,11 +166,11 @@ namespace SqlEngine
 
                 treeODBC.Nodes.Add(rootCloud);
 
-             /*   TreeNode rootSQLite = new TreeNode("SQLite", 23, 23);
+                TreeNode rootSQLite = new TreeNode("SQLite", 23, 23);
                 rootSQLite.Tag = "SQLite";
                 GetSQLiteRecords(rootSQLite);
                 treeODBC.Nodes.Add(rootSQLite);
-             */
+             
 
                 TreeNode rootCSV = new TreeNode("csv", 20, 20);
                 rootCSV.Tag = "CSV";

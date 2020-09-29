@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-using static SqlEngine.In2SqlSvcCsv;
+using static SqlEngine.in2SqlSvcSQLite;
 
 
 namespace SqlEngine
@@ -33,9 +33,9 @@ namespace SqlEngine
 
         private void refreshList()
         {
-            In2SqlSvcCsv.vFolderList = In2SqlSvcCsv.FolderList();
+            in2SqlSvcSQLite.vDataBaseList = in2SqlSvcSQLite.DataBaseList();
             CMBoxConnection.Items.Clear();
-            foreach (var vCurrFolder in In2SqlSvcCsv.vFolderList)
+            foreach (var vCurrFolder in in2SqlSvcSQLite.vDataBaseList)
             {
                 CMBoxConnection.Items.Add(vCurrFolder.FolderName);
             }
@@ -44,7 +44,7 @@ namespace SqlEngine
 
         private void button2_Click(object sender, EventArgs e)
         {
-            In2SqlSvcCsv.vFolderList = In2SqlSvcCsv.FolderList();
+            in2SqlSvcSQLite.vDataBaseList = in2SqlSvcSQLite.DataBaseList();
             this.Close();
         }
 
@@ -93,7 +93,7 @@ namespace SqlEngine
 
             CsvName.Text = vCurrConnection;
 
-            FolderProperties vCurrFolderN = vFolderList.Find(item => item.FolderName == vCurrConnection);
+            SQLiteDataBases vCurrFolderN = vDataBaseList.Find(item => item.FolderName == vCurrConnection);
 
             CsvPath.Text = vCurrFolderN.Path;
         }

@@ -21,6 +21,7 @@ namespace SqlEngine
             else if (vDriver.ToUpper().Contains("MYODBC")) vDBType = "MYSQL";
             else if (vDriver.ToUpper().Contains("IBM")) vDBType = "DB2";
             else if (vDriver.ToUpper().Contains("DB2")) vDBType = "DB2";
+            else if (vDriver.ToUpper().Contains("SQLITE")) vDBType = "SQLITE";
             else if (vDriver.ToUpper().Contains("CLICKHOUSE")) vDBType = "CH";
             
             return vDBType;
@@ -37,6 +38,7 @@ namespace SqlEngine
             else if (vTypeDB.Contains("MYSQL")) vResult = getMySqlViews();
             else if (vTypeDB.Contains("DB2")) vResult = getDb2Views();
             else if (vTypeDB.Contains("CH")) vResult = getCHViews();
+            else if (vTypeDB.Contains("SQLITE")) vResult = getSQLiteViews();
             return vResult;
         } 
 
@@ -50,6 +52,7 @@ namespace SqlEngine
             else if (vTypeDB.Contains("MYSQL")) vResult = getMySqlTables();
             else if (vTypeDB.Contains("DB2")) vResult = getDb2Tables();
             else if (vTypeDB.Contains("CH")) vResult = getCHTables();
+            else if (vTypeDB.Contains("SQLITE")) vResult = getSQLiteTables(); 
             return vResult;
         }
 
@@ -89,6 +92,7 @@ namespace SqlEngine
             else if (vTypeDB.Contains("MYSQL")) vResult = getMySqlColumns();
             else if (vTypeDB.Contains("DB2")) vResult = getDb2Columns();
             else if (vTypeDB.Contains("CH")) vResult = getCHTablesColumns();
+            else if (vTypeDB.Contains("SQLITE")) vResult = getSQLiteTablesColumns();
             return vResult;
         }
 
@@ -102,6 +106,7 @@ namespace SqlEngine
             else if (vTypeDB.Contains("MYSQL")) vResult = getMySqlIndexes();
             else if (vTypeDB.Contains("DB2")) vResult = getDb2Indexes();
             else if (vTypeDB.Contains("CH")) vResult = getMsSqlDummy();
+            else if (vTypeDB.Contains("SQLITE")) vResult = getSQLiteIndexes();
             return vResult;
         }
 
@@ -157,6 +162,26 @@ namespace SqlEngine
         public static string getCHTables()
         {
             return @"SELECT distinct database ||'.'|| name value FROM system.tables where engine <> 'View' ";
+        }
+
+        public static string getSQLiteTables()
+        {
+            return @"  select name value from sqlite_master where 1=1 and type='table'  ";
+        }
+
+        public static string getSQLiteViews()
+        {
+            return @"  select name value from sqlite_master where 1=1 and type='view'   ";
+        }
+         
+        public static string getSQLiteTablesColumns()
+        {
+            return @" SELECT p.name as value FROM sqlite_master m left outer join pragma_table_info((m.name)) p  on 1=1 where  m.name = '%TNAME%' ";
+        } 
+
+        public static string getSQLiteIndexes()
+        {
+            return @" SELECT p.name as value FROM sqlite_master m left outer join pragma_table_info((m.name)) p  on 1=1 where  m.name = '%TNAME%' ";
         }
 
         public static string getCHTablesColumns ()

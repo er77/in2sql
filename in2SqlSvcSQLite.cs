@@ -1,7 +1,7 @@
-﻿using Microsoft.VisualBasic.FileIO;
-using Microsoft.Win32;
+﻿using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Data.SQLite;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -11,48 +11,66 @@ using System.Windows.Forms;
 namespace SqlEngine
 {
     class in2SqlSvcSQLite
-    {
-
-        public struct SQLiteObjects
+    { 
+        public struct SQLiteObjectsAndProperties
         {
-            public String Name;
-            public int idTbl;
+            public List<String> objColumns;
+            public List<String> objIndexes;
+            public List<String> objDependencies;
+            public String ObjName; 
         }
 
         public static int vIdtbl = 0;
 
-        public struct FilesAndProperties
+        public struct SQLiteObjects
         {
-            public List<String> objColumns;
-            public String ObjName;
+            public String Name;
+            public String DatabaseFileName;
+            public int idTbl;
+            public List<String> Tables;
+            public List<String> Views;
         }
 
-        public struct FolderProperties
+        public struct SQLiteDataBases
         {
             public string FolderName, Path;
-            public List<SQLiteObjects> Files;
+            public List<SQLiteObjects> DataBases;            
 
         }
 
-        public static List<FolderProperties> vFolderList = FolderList();
+        public static List<SQLiteDataBases> vDataBaseList = DataBaseList();
 
-        public static List<FilesAndProperties> vFileObjProp = new List<FilesAndProperties>();
+        public static List<SQLiteObjectsAndProperties> vFileObjProp = new List<SQLiteObjectsAndProperties>();
 
         public static string getFirstFolder()
         {
-            if (vFolderList != null)
-                return vFolderList[0].Path + "\\";
+            if (vDataBaseList != null)
+                return vDataBaseList[0].Path + "\\";
 
             return "c:\\Temp\\";
         }
 
-        public static List<FolderProperties> FolderList()
+        public static string getDBFileName(string vSQLiteFolder, string vSQLiteName)
         {
             try
             {
-                List<FolderProperties> listClooudProperties = new List<FolderProperties>();
-                listClooudProperties.AddRange(getCsvList());
-                return listClooudProperties;
+                var vCurrFolder = vDataBaseList.Find(item => item.FolderName == vSQLiteFolder); 
+                return vCurrFolder.Path + '\\' + vSQLiteName;
+            }
+            catch (Exception e)
+            {
+                In2SqlSvcTool.ExpHandler(e, "getDBFileName");
+                return null;
+            }
+        }
+
+        public static List<SQLiteDataBases> DataBaseList()
+        {
+            try
+            {
+                List<SQLiteDataBases> listDataBase = new List<SQLiteDataBases>();
+                listDataBase.AddRange(getSQLiteCatalogs());
+                return listDataBase;
             }
             catch (Exception e)
             {
@@ -63,16 +81,16 @@ namespace SqlEngine
 
         public static IEnumerable<SQLiteObjects> getFileList(string vCurrFolderName)
         {
-            FolderProperties vCurrFolderN = vFolderList.Find(item => item.FolderName == vCurrFolderName);
+            SQLiteDataBases vCurrFolderN = vDataBaseList.Find(item => item.FolderName == vCurrFolderName);
 
-            return getFiesinFolderList(vCurrFolderN.Path);
+            return getDBFilesFromFolder(vCurrFolderN.Path);
 
         }
 
-        private static IEnumerable<SQLiteObjects> getFiesinFolderList(string vFolderPath)
+        private static IEnumerable<SQLiteObjects> getDBFilesFromFolder(string vFolderPath)
         {
             DirectoryInfo d = new DirectoryInfo(@vFolderPath);
-            FileInfo[] Files = d.GetFiles("*.csv");
+            FileInfo[] Files = d.GetFiles("*.db");
             string str = "";
             foreach (FileInfo file in Files)
             {
@@ -83,89 +101,110 @@ namespace SqlEngine
                 vIdtbl = vIdtbl + 1;
                 yield return vObj;
             }
+        } 
+
+        public static IEnumerable<String> SQLiteReadDataValue(string vSQLiteDBFile, string queryString = "")
+        { 
+            using (SQLiteConnection connect = new SQLiteConnection(@"Data Source=" + vSQLiteDBFile))
+            {
+                connect.Open();
+                using (SQLiteCommand fmd = connect.CreateCommand())
+                {
+                    fmd.CommandText = queryString;
+                    SQLiteDataReader r = fmd.ExecuteReader();
+                    while (r.Read())
+                    {
+                        yield return r["value"].ToString();
+                    }
+                    connect.Close();
+                }
+            }            
         }
 
-
-        public static IEnumerable<FilesAndProperties> getCsvFileColumn(string vCurrFolderName, string vObjName)
+        public static IEnumerable<String> getSQLiteViewList(string vSQLiteFileName)
         {
-            FolderProperties vCurrFolderN = vFolderList.Find(item => item.FolderName == vCurrFolderName);
+            var vViews = SQLiteReadDataValue(vSQLiteFileName, in2SqlLibrary.getSqlViews( "SQLITE"));
+            foreach (var vCurrView in vViews)
+            { 
+                yield return vCurrView.ToString();
+            }
+        }
 
-            FilesAndProperties vObject = new FilesAndProperties();
-            vObject.ObjName = vCurrFolderName + '.' + vObjName;
+        public static IEnumerable<String> getSQLiteTableList(string vSQLiteFileName)
+        {
+            var vTables = SQLiteReadDataValue(vSQLiteFileName, in2SqlLibrary.getSqlTables("SQLITE"));
+            foreach (var vCurrTable in vTables)
+            { 
+                yield return vCurrTable.ToString();
+            }
+        }
+
+        public static IEnumerable<SQLiteObjectsAndProperties> getObjectProperties(string vSQLiteFileName, string vObjName)
+        {
+           
+            string vSql = in2SqlLibrary.getSQLTableColumn("SQLITE");
+
+            vSql = vSql.Replace("%TNAME%", vObjName);             
+
+            var vObjects = SQLiteReadDataValue(vSQLiteFileName, vSql);
+
+            SQLiteObjectsAndProperties vObject = new SQLiteObjectsAndProperties();
+            vObject.ObjName = vSQLiteFileName + '.' + vObjName;
             vObject.objColumns = new List<string>();
 
-            using (TextFieldParser csvReader = new TextFieldParser(vCurrFolderN.Path + "\\" + vObjName))
+            foreach (var vCurrObject in vObjects)
             {
-                csvReader.SetDelimiters(new string[] { "," });
-                csvReader.HasFieldsEnclosedInQuotes = true;
-                string[] colFields = csvReader.ReadFields();
-                foreach (string column in colFields)
-                {
-                    vObject.objColumns.Add(column.ToString().Replace('"', ' ').Trim());
-                }
+                vObject.objColumns.Add(vCurrObject);
             }
 
-            yield return vObject;
+            vSql = in2SqlLibrary.getSQLIndexes("SQLITE");
+           
+                vSql = vSql.Replace("%TNAME%", vObjName);            
 
+            vObjects = SQLiteReadDataValue(vSQLiteFileName, vSql);
+            vObject.objIndexes = new List<string>();
+
+            foreach (var vCurrObject in vObjects)
+            {
+                vObject.objIndexes.Add(vCurrObject);
+            } 
+
+            yield return vObject;
         }
 
-
-        public static IEnumerable<FolderProperties> getCsvList()
+        public static IEnumerable<SQLiteDataBases> getSQLiteCatalogs()
         {
             RegistryKey vCurrRegKey = Registry.CurrentUser.OpenSubKey(@"Software\in2sql");
-            string vCurrName = "";
-            string vPrevName = "";
+        
             if (vCurrRegKey != null)
             {
-                FolderProperties vFolderProp = new FolderProperties();
+                SQLiteDataBases vFolderProp ;
 
                 foreach (string name in vCurrRegKey.GetValueNames())
                 {
-                    if (name.Contains("Csv"))
-                    {
+                    if (name.Contains("SQLite"))
+                    {                        
                         string[] vNameDetails = name.Split('.');
 
                         if (vNameDetails.Count() < 2)
                         {
                             MessageBox.Show("Error in reading registry getCsvList ");
-                            yield return new FolderProperties();
+                            yield return new SQLiteDataBases();
                             break;
                         }
-                        vCurrName = vNameDetails[1];
 
-                        if (!vCurrName.Equals(vPrevName))
-                        {
-                            if (vPrevName.Length > 2)
-                                yield return vFolderProp;
+                        vFolderProp = new SQLiteDataBases();
 
-                            vFolderProp = new FolderProperties();
-                        }
-
-                        vPrevName = vCurrName;
-
-                        vFolderProp.FolderName = vCurrName;
-
-                        string vCurrRegValue = in2SqlRegistry.getLocalRegValue(vCurrRegKey, name);
+                        vFolderProp.FolderName = vNameDetails[1];                         
 
                         if (name.Contains("Path"))
-                            vFolderProp.Path = vCurrRegValue;
-
-                        if (vFolderProp.Path != null)
-                        {
-                            vPrevName = "";
-                            yield return vFolderProp;
+                        {  vFolderProp.Path = in2SqlRegistry.getLocalRegValue(vCurrRegKey, name);
+                            yield return vFolderProp;                           
                         }
-                    }
-                    else
-                    {
-                        if (vPrevName.Length > 2)
-                        {
-                            vPrevName = "";
-                        }
-                    }
-
+                    }                 
                 }
             }
         }
+
     }
 }
