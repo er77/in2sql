@@ -40,7 +40,7 @@ namespace SqlEngine
 
         public static List<SQLiteDataBases> vDataBaseList = DataBaseList();
 
-        public static List<SQLiteObjectsAndProperties> vFileObjProp = new List<SQLiteObjectsAndProperties>();
+        public static List<SQLiteObjectsAndProperties> vSQLiteObjProp = new List<SQLiteObjectsAndProperties>();
 
         public static string getFirstFolder()
         {
