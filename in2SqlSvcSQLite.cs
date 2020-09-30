@@ -87,18 +87,15 @@ namespace SqlEngine
 
         }
 
-        private static IEnumerable<SQLiteObjects> getDBFilesFromFolder(string vFolderPath)
+        public static IEnumerable<SQLiteObjects> getDBFilesFromFolder(string vFolderPath)
         {
             DirectoryInfo d = new DirectoryInfo(@vFolderPath);
-            FileInfo[] Files = d.GetFiles("*.db");
-            string str = "";
+            FileInfo[] Files = d.GetFiles("*.db");          
             foreach (FileInfo file in Files)
-            {
-                str = str + ", " + file.Name;
+            { 
                 SQLiteObjects vObj = new SQLiteObjects();
                 vObj.Name = file.Name;
-                vObj.idTbl = vIdtbl;
-                vIdtbl = vIdtbl + 1;
+                vObj.DatabaseFileName = vFolderPath + "\\" + file.Name;
                 yield return vObj;
             }
         } 
@@ -139,17 +136,17 @@ namespace SqlEngine
             }
         }
 
-        public static IEnumerable<SQLiteObjectsAndProperties> getObjectProperties(string vSQLiteFileName, string vObjName)
+        public static IEnumerable<SQLiteObjectsAndProperties> getObjectProperties(string vDBName, string vObjName, string vDBFileName)
         {
            
             string vSql = in2SqlLibrary.getSQLTableColumn("SQLITE");
 
             vSql = vSql.Replace("%TNAME%", vObjName);             
 
-            var vObjects = SQLiteReadDataValue(vSQLiteFileName, vSql);
+            var vObjects = SQLiteReadDataValue(vDBFileName, vSql);
 
             SQLiteObjectsAndProperties vObject = new SQLiteObjectsAndProperties();
-            vObject.ObjName = vSQLiteFileName + '.' + vObjName;
+            vObject.ObjName = vDBName + '.' + vObjName;
             vObject.objColumns = new List<string>();
 
             foreach (var vCurrObject in vObjects)
@@ -161,7 +158,7 @@ namespace SqlEngine
            
                 vSql = vSql.Replace("%TNAME%", vObjName);            
 
-            vObjects = SQLiteReadDataValue(vSQLiteFileName, vSql);
+            vObjects = SQLiteReadDataValue(vDBName, vSql);
             vObject.objIndexes = new List<string>();
 
             foreach (var vCurrObject in vObjects)

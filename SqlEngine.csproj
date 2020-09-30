@@ -278,6 +278,7 @@
     <Compile Include="in2SqlRegistry.cs" />
     <Compile Include="In2SqlRibbon.cs" />
     <Compile Include="in2SqlRightPaneTreeCloud.cs" />
+    <Compile Include="in2SqlRightPaneTreeSQLite.cs" />
     <Compile Include="in2sqlSvcCloud.cs" />
     <Compile Include="In2SqlSvcCsv.cs" />
     <Compile Include="in2SqlSvcSQLite.cs" />
