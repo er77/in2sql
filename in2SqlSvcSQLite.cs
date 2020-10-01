@@ -1,7 +1,9 @@
-﻿using Microsoft.Win32;
+﻿using CsvHelper;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -41,15 +43,7 @@ namespace SqlEngine
         public static List<SQLiteDataBases> vDataBaseList = DataBaseList();
 
         public static List<SQLiteObjectsAndProperties> vSQLiteObjProp = new List<SQLiteObjectsAndProperties>();
-
-        public static string getFirstFolder()
-        {
-            if (vDataBaseList != null)
-                return vDataBaseList[0].Path + "\\";
-
-            return "c:\\Temp\\";
-        }
-
+ 
         public static string getDBFileName(string vSQLiteFolder, string vSQLiteName)
         {
             try
@@ -63,6 +57,8 @@ namespace SqlEngine
                 return null;
             }
         }
+
+  
 
         public static List<SQLiteDataBases> DataBaseList()
         {
@@ -101,8 +97,9 @@ namespace SqlEngine
         } 
 
         public static IEnumerable<String> SQLiteReadDataValue(string vSQLiteDBFile, string queryString = "")
-        { 
-            using (SQLiteConnection connect = new SQLiteConnection(@"Data Source=" + vSQLiteDBFile))
+        {
+            if (File.Exists(vSQLiteDBFile))
+                using (SQLiteConnection connect = new SQLiteConnection(@"Data Source=" + vSQLiteDBFile))
             {
                 connect.Open();
                 using (SQLiteCommand fmd = connect.CreateCommand())
@@ -115,7 +112,12 @@ namespace SqlEngine
                     }
                     connect.Close();
                 }
-            }            
+            }
+            else
+            {
+                MessageBox.Show("DB file " + vSQLiteDBFile + " was not found ", " SQLiteReadDataValue ",
+                                                                       MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         public static IEnumerable<String> getSQLiteViewList(string vSQLiteFileName)
@@ -200,6 +202,69 @@ namespace SqlEngine
                         }
                     }                 
                 }
+            }
+        }
+
+
+
+        public static void dumpSQLiteToCsv(string vDBCatalogName, string vDBName,  string vSqlCommand, string vCsvFile, int vShoMsgBOx = 1 )
+        {
+            try { 
+
+                string vSQLiteDBFile = getDBFileName(vDBCatalogName, vDBName);
+                int i = 0;
+                if (File.Exists(vSQLiteDBFile))
+                using (SQLiteConnection connect = new SQLiteConnection(@"Data Source=" + vSQLiteDBFile))
+                {
+                    connect.Open();
+
+                    In2SqlSvcTool.addSqlLog(vSQLiteDBFile, vSqlCommand);
+                    using (SQLiteCommand fmd = connect.CreateCommand())
+                    {
+                        fmd.CommandText = vSqlCommand;
+                        SQLiteDataReader r = fmd.ExecuteReader();
+
+                        object[] output = new object[r.FieldCount];
+                        using (var textWriter = new StreamWriter(@vCsvFile))
+                        {
+                            var writer = new CsvWriter(textWriter, CultureInfo.InvariantCulture);
+                            writer.Configuration.Delimiter = ",";
+                            writer.Configuration.ShouldQuote = (field, context) => true;
+
+                            for (int j = 0; j < r.FieldCount; j++)
+                            {
+                                output[j] = r.GetName(j);
+                                writer.WriteField(r.GetName(j));
+                            }
+
+                            writer.NextRecord();
+
+                            while (r.Read())
+                            {
+                                r.GetValues(output);
+                                writer.WriteField(output);
+                                writer.NextRecord();
+                                i++;
+                            }
+                            connect.Close();
+                        }
+                    }
+                    if (vShoMsgBOx==1 )
+                        MessageBox.Show("Export completed. \n\r File name is " + vCsvFile + " \n\r Row count:" + i, "csv export",
+                                                                             MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                else
+                {
+                    MessageBox.Show("DB file " + vSQLiteDBFile + " was not found " , " dumpSQLiteToCsv ",
+                                                                         MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                
+               
+            }
+            catch (Exception e)
+            {
+                if (e.HResult != -2147024809)
+                    In2SqlSvcTool.ExpHandler(e, "dumpOdbctoCsv");
             }
         }
 
