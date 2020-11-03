@@ -50,6 +50,9 @@
             this.contextMenuCHRoot = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.contextMenuCSV = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.contextMenuSqLiteRoot = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.contextMenuTableSQLite = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.contextMenuSQLiteFolder = new System.Windows.Forms.ContextMenuStrip(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -240,7 +243,22 @@
             // contextMenuSqLiteRoot
             // 
             this.contextMenuSqLiteRoot.Name = "contextMenuSqLiteRoot";
-            this.contextMenuSqLiteRoot.Size = new System.Drawing.Size(181, 26);
+            this.contextMenuSqLiteRoot.Size = new System.Drawing.Size(61, 4);
+            // 
+            // contextMenuTableSQLite
+            // 
+            this.contextMenuTableSQLite.Name = "contextMenuTableSQLite";
+            this.contextMenuTableSQLite.Size = new System.Drawing.Size(61, 4);
+            // 
+            // contextMenuStrip1
+            // 
+            this.contextMenuStrip1.Name = "contextMenuStrip1";
+            this.contextMenuStrip1.Size = new System.Drawing.Size(61, 4);
+            // 
+            // contextMenuSQLiteFolder
+            // 
+            this.contextMenuSQLiteFolder.Name = "contextMenuSQLiteFolder";
+            this.contextMenuSQLiteFolder.Size = new System.Drawing.Size(181, 26);
             // 
             // in2SqlWF03PanelRigtSqlM
             // 
@@ -285,5 +303,8 @@
         private System.Windows.Forms.ContextMenuStrip contextMenuCHRoot;
         private System.Windows.Forms.ContextMenuStrip contextMenuCSV;
         private System.Windows.Forms.ContextMenuStrip contextMenuSqLiteRoot;
+        private System.Windows.Forms.ContextMenuStrip contextMenuTableSQLite;
+        private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
+        private System.Windows.Forms.ContextMenuStrip contextMenuSQLiteFolder;
     }
 }

@@ -62,10 +62,18 @@ namespace SqlEngine
                 new TreeNodeMouseClickEventHandler(this.treeODBC_NodeMouseClick); 
             this.treeODBC.KeyPress +=
                 new KeyPressEventHandler(this.in2SqlRightPane_KeyPress); 
-            this.treeODBC.AllowDrop = true; 
+            this.treeODBC.AllowDrop = true;
 
+            contextMenuTableSQLite = null;
+            contextMenuTable = null;
+            contextMenuRootODBC = null;
+            contextMenuEditCH = null;
+            contextMenuCSV = null;
+            contextMenuCHRoot = null;
+            contextMenuSqLiteRoot = null;
+            contextMenuOdbcError = null;
+            contextMenuSQLiteFolder = null;
 
- 
         }
 
         public static TreeNode getNode ( int X, int Y )
@@ -164,13 +172,7 @@ namespace SqlEngine
                 GetCloudRecords(tnClickHouse, "CloudCH");
                 rootCloud.Nodes.Add(tnClickHouse);
 
-                treeODBC.Nodes.Add(rootCloud);
-
-                TreeNode rootSQLite = new TreeNode("SQLite", 23, 23);
-                rootSQLite.Tag = "SQLite";
-                GetSQLiteRecords(rootSQLite);
-                treeODBC.Nodes.Add(rootSQLite);
-             
+                treeODBC.Nodes.Add(rootCloud);                
 
                 TreeNode rootCSV = new TreeNode("csv", 20, 20);
                 rootCSV.Tag = "CSV";
@@ -201,26 +203,7 @@ namespace SqlEngine
             {
                 In2SqlSvcTool.ExpHandler(er, "GetCloudRecords");
             }
-        }
-
-        private void GetSQLiteRecords(TreeNode nodeToAddTo)
-        {
-            //try  read from registry my SQLite settings 
-            try {
-                in2SqlSvcSQLite.vDataBaseList = in2SqlSvcSQLite.DataBaseList();
-
-                foreach (var vCurrFolder in in2SqlSvcSQLite.vDataBaseList)
-                {
-                    in2SqlRightPaneTreeTables.setSQLiteTreeLineSimple(nodeToAddTo, vCurrFolder.FolderName, "SQLITE$");
-                }
-                return;
-            }
-            catch (Exception er)
-            {
-                In2SqlSvcTool.ExpHandler(er, "GetCloudRecords");
-            }
-              
-        }
+        } 
 
         private void GetCSVRecords(TreeNode nodeToAddTo )
         {
@@ -277,24 +260,23 @@ namespace SqlEngine
             }
         } 
       
-        private ContextMenuStrip createMenu(TreeNodeMouseClickEventArgs e, String[] vMenu, EventHandler myFuncName, ContextMenuStrip vCurrMenu)
-        {            
-            if (e.Node.ContextMenuStrip == null)
-            {
-                if (vCurrMenu.Items.Count < 1 )
+        private ContextMenuStrip createMenu(TreeNodeMouseClickEventArgs e, String[] vMenu, EventHandler myFuncName, ContextMenuStrip vCMenu)
+        {          
+            if (vCMenu == null)
+             {
+                ContextMenuStrip vCurrMenu = new ContextMenuStrip();
+                foreach (string rw in vMenu)
                 {
-                    vCurrMenu.Items.Clear();
-
-                    foreach (string rw in vMenu)
-                    {
-                        ToolStripMenuItem vMenuRun = new ToolStripMenuItem(rw);
-                        vMenuRun.Click += myFuncName;
-                        vCurrMenu.Items.Add(vMenuRun);
-                    }
+                    ToolStripMenuItem vMenuRun = new ToolStripMenuItem(rw);
+                    vMenuRun.Click += myFuncName;
+                    vCurrMenu.Items.Add(vMenuRun);
                 }
-                e.Node.ContextMenuStrip = vCurrMenu;
+                vCMenu = vCurrMenu;
             }
-            return vCurrMenu;
+
+              e.Node.ContextMenuStrip = vCMenu;
+            
+            return vCMenu;
         }         
 
         private void rootMenu_Click(object sender, EventArgs e)
@@ -375,23 +357,7 @@ namespace SqlEngine
                 miSelectNode.ImageIndex = 990;  
             }
 
-        } 
-
-        private void sqlLight_Click(object sender, EventArgs e)
-        {
-              if (sender.ToString().Contains("Create"))
-            {
-                in2SqlWF11SqliteEdit frmshowSQLite = new in2SqlWF11SqliteEdit();
-                 frmshowSQLite.Show();
-
-            }
-            else if (sender.ToString().Contains("Refresh"))
-            {
-                miSelectNode.Nodes.Clear();
-                //GetCloudRecords(miSelectNode, "CloudCH");
-            } 
-
-        }
+        }  
 
         private TreeNode fTN = null;
 
@@ -425,7 +391,25 @@ namespace SqlEngine
             } 
                 return fTN; 
         }
-                  
+
+        //
+
+
+        private void SQLiteFolder_Click(object sender, EventArgs e)
+        {  //{ "Create SQLiteDatabase", "Refresh" }
+
+            if (sender.ToString().Contains("Create SQLiteDatabase"))
+                MessageBox.Show(string.Concat("You have Clicked '", sender.ToString(), "' Menu"), "Menu Items Event",
+                                                                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+            else if (sender.ToString().Contains("Refresh"))
+                miSelectNode.Nodes.Clear();
+
+            else 
+                MessageBox.Show(string.Concat("You have Clicked '", sender.ToString(), "' Menu"), "Menu Items Event",
+                                                                         MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+
+        }
 
         private void ExTableMenu_Click(object sender, EventArgs e)
         {
@@ -455,12 +439,7 @@ namespace SqlEngine
 
             else if (sender.ToString().Contains("Table"))
                 if (miSelectNode.Parent.Parent.Tag.ToString().Contains("Cloud"))
-                    In2SqlVBAEngineCloud.createExTable(miSelectNode.Parent.Parent.Text, miSelectNode.Text,null);
-
-                else if (miSelectNode.Parent.Parent.Tag.ToString().Contains("SQLITE"))
-                    In2SqlVBAEngineSQLite.createExTable(miSelectNode.Parent.Parent.Parent.Text
-                                                    , miSelectNode.Parent.Parent.Text
-                                                    ,miSelectNode.Text, null);
+                    In2SqlVBAEngineCloud.createExTable(miSelectNode.Parent.Parent.Text, miSelectNode.Text,null);             
 
                 else
                      intSqlVBAEngine.createExTable(miSelectNode.Parent.Parent.Text, miSelectNode.Text);
@@ -470,15 +449,7 @@ namespace SqlEngine
                     In2SqlSvcODBC.dumpOdbctoCsv(
                                      miSelectNode.Parent.Parent.Text
                                    , "select * from  " + miSelectNode.Text
-                                   , In2SqlSvcCsv.getFirstFolder() + miSelectNode.Text + ".csv");
-                else if (miSelectNode.Parent.Parent.Tag.ToString().ToUpper().Contains("SQLITE"))
-                    in2SqlSvcSQLite.dumpSQLiteToCsv(
-                                 miSelectNode.Parent.Parent.Parent.Text
-                               , miSelectNode.Parent.Parent.Text
-                               , "select * from  " + miSelectNode.Text
-                               , In2SqlSvcCsv.getFirstFolder() + miSelectNode.Text + ".csv");
-            /* else
-                intSqlVBAEngine.createExTable(miSelectNode.Parent.Parent.Text, miSelectNode.Text);*/
+                                   , In2SqlSvcCsv.getFirstFolder() + miSelectNode.Text + ".csv");                 
 
             else if (sender.ToString().Contains("Chart"))
                 MessageBox.Show(string.Concat("You have Clicked '", sender.ToString(), "' Menu"), "Menu Items Event",
@@ -494,76 +465,99 @@ namespace SqlEngine
         private void contextMenu(TreeNodeMouseClickEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
-                return;            
+                return;
 
-            if ((e.Node.Tag.ToString().Contains("VIEW") | e.Node.Tag.ToString().Contains("TABLE")))
-                {   this.contextMenuTable = createMenu(
-                        e
-                        , new String[] { "to Table", "to PivotTable", "generate CSV" }
-                        , RegularObjecteMenu_Click
-                        , this.contextMenuTable);
+            if (e.Node.ContextMenuStrip == null)
+            {
+                if ((e.Node.Tag.ToString().Contains("clm")))
+                { 
                     return;
                 }
 
-                if ( (e.Node.Tag.ToString().Contains("root")))
-            {
-                contextMenuRootODBC = createMenu(
-                                e
-                            , new String[] { "Edit", "Refresh" }
-                            , rootMenu_Click
-                            , contextMenuRootODBC);
-                return;
-            }
+                string vNodeTag = e.Node.Tag.ToString().ToUpper();
 
-            if (  (e.Node.Tag.ToString().ToUpper().Contains("CLOUD")) & (e.Node.Tag.ToString().ToUpper().Contains("CH")))
-            {
-                contextMenuEditCH = createMenu(
-                                e
-                            , new String[] { "Edit", "Delete" }
-                            , clickHouse_Click
-                            , contextMenuEditCH);
-                return;
-            }
+                if (vNodeTag.Contains("FLD")  & vNodeTag.Contains("SQLITE") ) 
+                {
+                    contextMenuSQLiteFolder = createMenu(
+                                    e
+                                , new String[] { "Create SQLiteDatabase", "Refresh" }
+                                , SQLiteFolder_Click
+                                , contextMenuSQLiteFolder);
+                    return;
+                }
 
-            if (  (e.Node.Tag.ToString().ToUpper().Contains("CSV")) & (e.Node.Text.ToString().ToUpper().Contains("CSV")))
-            {
-                contextMenuEditCH = createMenu(
-                                e
-                            , new String[] { "Edit", "Refresh" }
-                            , clickCSV_Click
-                            , contextMenuCSV);
-                return;
-            }
+                if ((vNodeTag.Contains("VIEW") | vNodeTag.Contains("TABLE")))
+                    if (miSelectNode.Parent.Parent.Tag.ToString().ToUpper().Contains("SQLITE"))
+                    { 
+                            this.contextMenuTableSQLite = createMenu(
+                              e
+                              , new String[] { "to Table", "generate CSV" }
+                              , RegularObjecteMenu_Click
+                              , this.contextMenuTableSQLite);
+                            return;                        
+                    }
+                    else
+                    {                         
+                            this.contextMenuTable = createMenu(
+                         e
+                         , new String[] { "to Table", "to PivotTable", "generate CSV" }
+                         , RegularObjecteMenu_Click
+                         , this.contextMenuTable);
+                            return;                        
+                    }
 
-            if (  (e.Node.Tag.ToString().ToUpper().Contains("CLICKHOUSE")))
-            {
-                contextMenuCHRoot = createMenu(
-                                e
-                            , new String[] { "Create", "Refresh" }
-                            , clickHouse_Click
-                            , contextMenuCHRoot);
-                return;
-            }
+                if ((vNodeTag.Contains("ROOT")))
+                {                     
+                        contextMenuRootODBC = createMenu(
+                                        e
+                                    , new String[] { "Edit", "Refresh" }
+                                    , rootMenu_Click
+                                    , contextMenuRootODBC);                    
+                        return;
+                }
 
-            if (  (e.Node.Tag.ToString().ToUpper().Contains("SQLITE")))
-            {
-                contextMenuCHRoot = createMenu(
-                                e
-                            , new String[] { "Create", "Refresh" }
-                            , sqlLight_Click
-                            , contextMenuSqLiteRoot);
-                return;
-            }
+                if ((vNodeTag.Contains("CLOUD")) & (vNodeTag.Contains("CH")))
+                {
+                     
+                        contextMenuEditCH = createMenu(
+                                        e
+                                    , new String[] { "Edit", "Delete" }
+                                    , clickHouse_Click
+                                    , contextMenuEditCH);
+                        return;
+                    
+                }
 
-            if (  (e.Node.Tag.ToString().Contains("ODBC%")))
-            {
-                contextMenuOdbcError = createMenu(
-                            e
-                            , new String[] { "ReConnect", "Edit", "Login" }
-                            , rootMenu_Click
-                            , contextMenuOdbcError);
-                return;
-            }            
+                if ((vNodeTag.Contains("CSV")) & (vNodeTag.Contains("CSV")))
+                {                    
+                        contextMenuCSV = createMenu(
+                                        e
+                                    , new String[] { "Edit", "Refresh" }
+                                    , clickCSV_Click
+                                    , contextMenuCSV);
+                        return;                    
+                }
+
+                if ((vNodeTag.Contains("CLICKHOUSE")))
+                {                    
+                        contextMenuCHRoot = createMenu(
+                                        e
+                                    , new String[] { "Create", "Refresh" }
+                                    , clickHouse_Click
+                                    , contextMenuCHRoot);
+                        return;                    
+                } 
+
+                if ((vNodeTag.Contains("ODBC%")))
+                { 
+                        contextMenuOdbcError = createMenu(
+                                    e
+                                    , new String[] { "ReConnect", "Edit", "Login" }
+                                    , rootMenu_Click
+                                    , contextMenuOdbcError);
+                        return;                     
+                }
+            }
         }
 
          private void expand_action (TreeNodeMouseClickEventArgs e)
@@ -577,20 +571,7 @@ namespace SqlEngine
                     in2SqlRightPaneTreeCloud.getCloudTablesAndViews(e);
                     return;
                 }
-
-                if ( (e.Node.Tag.ToString().ToUpper().Contains("SQLITE$")) & (e.Node.Parent.Text.ToString().ToUpper().Contains("SQLITE")))
-                {
-                    in2SqlRightPaneTreeSQLite.getSQLiteFolderObjects(e);
-                    return;
-                }
-
-                if ( (e.Node.Tag.ToString().ToUpper().Contains("$SQLITE_DBASE$")))
-                {
-                    in2SqlRightPaneTreeSQLite.getSQLiteTablesAndViews(e);
-                    return;
-                }
-
-
+            
                 if ( (e.Node.Tag.ToString().Contains("ODBC$")))
                 {
                     in2SqlRightPaneTreeTables.getTablesAndViews(e);
@@ -626,12 +607,7 @@ namespace SqlEngine
                         {
                             in2SqlRightPaneTreeCloud.getColumnsAndIndexes(e);
                             return;
-                        }
-                        else if (e.Node.Tag.ToString().Contains("SQLITE"))
-                        {
-                            in2SqlRightPaneTreeSQLite.getColumnsAndIndexes(e);
-                            return;
-                        }
+                        }                       
                         else
                         {
                             in2SqlRightPaneTreeTables.getColumnsandIndexes(e);

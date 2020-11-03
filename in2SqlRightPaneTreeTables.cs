@@ -87,7 +87,7 @@ namespace SqlEngine
             TreeNode vNodeDatabase = new TreeNode(vOdbcName, 8, 8);
 
             nodeToAddTo.Nodes.Add(vNodeDatabase);
-            vNodeDatabase.Tag = vOdbcType;
+            vNodeDatabase.Tag = "FLD|" + vOdbcType;
             TreeNode vNodeTable = new TreeNode(" ".ToString(), 100, 100); // vNodeTable.Tag = vCurrTable.Name;
             vNodeDatabase.Nodes.Add(vNodeTable);
         }
